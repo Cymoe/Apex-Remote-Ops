@@ -8,7 +8,13 @@ const nextConfig: NextConfig = {
   // experimental: {
   //   optimizeCss: true,
   // },
-  serverExternalPackages: ['@react-pdf/renderer'],
+  serverExternalPackages: ['@react-pdf/renderer', 'canvas'],
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.resolve.alias.canvas = false;
+    }
+    return config;
+  },
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },

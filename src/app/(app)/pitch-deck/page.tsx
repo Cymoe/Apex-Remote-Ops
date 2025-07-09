@@ -1,8 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PDFViewer } from '@/components/pdf';
+import dynamic from 'next/dynamic';
 import { StylePreview } from '@/components/pitch-deck-style-preview';
+
+// Dynamic import to prevent SSR issues with PDF libraries
+const PDFViewer = dynamic(
+  () => import('@/components/pdf').then(mod => mod.PDFViewer),
+  { 
+    ssr: false,
+    loading: () => <div className="flex items-center justify-center h-full"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>
+  }
+);
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
