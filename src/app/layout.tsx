@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Playfair_Display } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -13,6 +13,13 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   display: 'swap',
   variable: '--font-mono',
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  display: 'swap',
+  variable: '--font-serif',
+  weight: ['400', '500', '600', '700', '800', '900'],
 });
 
 export const metadata: Metadata = {
@@ -33,7 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans bg-carbon-black text-foreground`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable} font-sans bg-carbon-black text-foreground`}>
         {children}
         <Toaster 
           position="top-right"

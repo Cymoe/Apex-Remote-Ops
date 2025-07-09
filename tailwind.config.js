@@ -27,6 +27,7 @@ module.exports = {
   			'warning-red': '#EF4444',
   			'neutral-gray': '#6B7280',
   			'pure-white': '#FFFFFF',
+  			'soft-white': '#E8E6E3', // Softer warm off-white for better readability
   			'light-gray': '#E5E7EB',
   			'medium-gray': '#9CA3AF',
   			
@@ -71,8 +72,9 @@ module.exports = {
   			sm: 'var(--radius-sm)'
   		},
   		fontFamily: {
-  			'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-  			'mono': ['JetBrains Mono', 'monospace']
+  			'sans': ['var(--font-inter)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+  			'serif': ['var(--font-serif)', 'Playfair Display', 'Georgia', 'serif'],
+  			'mono': ['var(--font-mono)', 'JetBrains Mono', 'monospace']
   		},
   		keyframes: {
   			'accordion-down': {

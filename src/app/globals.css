@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom font utilities */
+@layer utilities {
+  .font-serif {
+    font-family: var(--font-serif), 'Playfair Display', Georgia, serif;
+  }
+  
+  .font-mono {
+    font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  }
+}
+
+
 /* Ocean Animations */
 @keyframes deepRise {
   0%, 100% { 
