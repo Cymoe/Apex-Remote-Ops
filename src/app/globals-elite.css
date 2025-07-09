@@ -1,0 +1,42 @@
+/* Elite Color Themes for RemoteOps */
+
+/* Option 1: Pure Luxury Black */
+.theme-luxury-black {
+  --color-carbon-black: #0A0A0A;
+  --color-slate-gray: #141414;
+  --color-deep-black: #050505;
+  --color-professional-blue: #4A7FFF; /* Slightly brighter for contrast */
+}
+
+/* Option 2: Royal Purple-Black */
+.theme-royal-purple {
+  --color-carbon-black: #0F0A1A;
+  --color-slate-gray: #1A1428;
+  --color-deep-black: #0A0512;
+  --color-professional-blue: #6366F1; /* Indigo-blue */
+  --color-accent-purple: #8B5CF6;
+}
+
+/* Option 3: Modern Charcoal */
+.theme-modern-charcoal {
+  --color-carbon-black: #0F0F0F;
+  --color-slate-gray: #1A1A1A;
+  --color-deep-black: #080808;
+  --color-professional-blue: #3B82F6;
+}
+
+/* Option 4: Wealth Green-Black */
+.theme-wealth-green {
+  --color-carbon-black: #0A0F0D;
+  --color-slate-gray: #141A17;
+  --color-deep-black: #050805;
+  --color-professional-blue: #10B981; /* Green accent */
+  --color-success-green: #34D399;
+}
+
+/* Current Theme (for comparison) */
+.theme-current {
+  --color-carbon-black: #111827;
+  --color-slate-gray: #1F2937;
+  --color-professional-blue: #3B82F6;
+}
