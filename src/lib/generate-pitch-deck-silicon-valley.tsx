@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import ChartJS from 'chart.js/auto';
 
 interface PitchDeckData {
   companyName: string;
@@ -34,101 +35,81 @@ interface PitchDeckData {
   financing: string;
 }
 
-// Helper function to create gradient effect
+// Helper functions for gradients and shapes
 const drawGradient = (pdf: jsPDF, x: number, y: number, width: number, height: number, color1: any, color2: any, steps = 50) => {
   for (let i = 0; i < steps; i++) {
     const ratio = i / steps;
-    const r = Math.round(color1.r * (1 - ratio) + color2.r * ratio);
-    const g = Math.round(color1.g * (1 - ratio) + color2.g * ratio);
-    const b = Math.round(color1.b * (1 - ratio) + color2.b * ratio);
+    const r = Math.round(color1.r + (color2.r - color1.r) * ratio);
+    const g = Math.round(color1.g + (color2.g - color1.g) * ratio);
+    const b = Math.round(color1.b + (color2.b - color1.b) * ratio);
     
     pdf.setFillColor(r, g, b);
-    pdf.rect(x, y + (height / steps) * i, width, height / steps + 0.5, 'F');
+    pdf.rect(x, y + (height / steps) * i, width, height / steps, 'F');
   }
 };
 
-// Helper function for rounded rectangles (approximation)
 const roundedRect = (pdf: jsPDF, x: number, y: number, width: number, height: number, radius: number, style: string = 'F') => {
-  // For now, use regular rectangles as jsPDF doesn't have built-in rounded rect
-  pdf.rect(x, y, width, height, style);
+  pdf.roundedRect(x, y, width, height, radius, radius, style);
 };
 
-// Helper function to create charts using Chart.js
 const createModernChart = async (type: string, data: any, options: any, width = 1200, height = 600): Promise<string> => {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  document.body.appendChild(canvas);
-
-  try {
-    const Chart = (await import('chart.js/auto')).default;
-    
-    const chart = new Chart(canvas, {
-      type: type as any,
-      data: data,
-      options: {
-        ...options,
-        responsive: false,
-        animation: false,
-        maintainAspectRatio: false,
-        plugins: {
-          ...options.plugins,
-          legend: {
-            ...options.plugins?.legend,
-            labels: {
-              font: {
-                family: "'Inter', sans-serif",
-                size: 14,
-                weight: '600'
-              },
-              color: '#334155'
-            }
-          }
-        }
+  const ctx = canvas.getContext('2d');
+  
+  if (!ctx) throw new Error('Could not get canvas context');
+  
+  // Create chart
+  const chart = new ChartJS(ctx, {
+    type: type as any,
+    data: data,
+    options: {
+      ...options,
+      responsive: false,
+      animation: { duration: 0 },
+      plugins: {
+        ...options.plugins,
+        legend: { display: false }
       }
-    });
-
-    await new Promise(resolve => setTimeout(resolve, 100));
-    const imageData = canvas.toDataURL('image/png');
-    chart.destroy();
-    document.body.removeChild(canvas);
-    return imageData;
-  } catch (error) {
-    if (document.body.contains(canvas)) {
-      document.body.removeChild(canvas);
     }
-    throw error;
-  }
+  });
+  
+  // Wait for chart to render
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  const imageData = canvas.toDataURL('image/png');
+  chart.destroy();
+  
+  return imageData;
 };
 
 export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
   const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape for modern presentation
-  const pageWidth = 297;
-  const pageHeight = 210;
-  const margin = 20;
-  const contentWidth = pageWidth - (2 * margin);
+  const pageWidth = 297;  // A4 landscape width
+  const pageHeight = 210; // A4 landscape height
+  const contentWidth = pageWidth - 60; // 30mm margins on each side
   
   // Modern color palette
   const colors = {
-    primary: { r: 107, g: 70, b: 193 },     // Purple
-    secondary: { r: 37, g: 99, b: 235 },    // Blue
-    accent: { r: 20, g: 184, b: 166 },      // Teal
-    success: { r: 16, g: 185, b: 129 },     // Green
-    warning: { r: 251, g: 146, b: 60 },     // Orange
-    dark: { r: 15, g: 23, b: 42 },          // Rich black
-    gray: { r: 100, g: 116, b: 139 },       // Slate gray
-    lightGray: { r: 241, g: 245, b: 249 },  // Off white
-    white: { r: 255, g: 255, b: 255 }
+    primary: { r: 107, g: 70, b: 193 },    // Purple
+    secondary: { r: 37, g: 99, b: 235 },   // Blue  
+    accent: { r: 20, g: 184, b: 166 },     // Teal
+    dark: { r: 15, g: 23, b: 42 },        // Dark slate
+    gray: { r: 100, g: 116, b: 139 },     // Slate gray
+    lightGray: { r: 248, g: 250, b: 252 }, // Light background
+    white: { r: 255, g: 255, b: 255 },
+    warning: { r: 239, g: 68, b: 68 },     // Red warning
+    success: { r: 34, g: 197, b: 94 }      // Green success
   };
 
-  // Typography helpers
+  // Font and color helpers
   const setFont = (size: number, weight: 'normal' | 'bold' = 'normal', color = colors.dark) => {
     pdf.setFont('helvetica', weight);
     pdf.setFontSize(size);
     pdf.setTextColor(color.r, color.g, color.b);
   };
 
-  // Parse currency helper
   const parseCurrency = (value: string): number => {
     return parseFloat(value?.replace(/[^0-9.-]+/g, '') || '0');
   };
@@ -157,31 +138,30 @@ export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
   
   // Tagline with modern styling
   setFont(24, 'normal', colors.lightGray);
-  pdf.text(data.tagline || 'Transforming Industries Through Innovation', pageWidth / 2, 100, { align: 'center' });
+  pdf.text(data.tagline || 'Transforming Industries Through Innovation', pageWidth / 2, 110, { align: 'center' });
   
   // Visual separator
   pdf.setDrawColor(colors.accent.r, colors.accent.g, colors.accent.b);
   pdf.setLineWidth(2);
-  pdf.line(pageWidth/2 - 40, 115, pageWidth/2 + 40, 115);
+  pdf.line(pageWidth/2 - 40, 125, pageWidth/2 + 40, 125);
   
-  // Key metrics preview
+  // Key metrics preview - Fixed spacing
   setFont(16, 'bold', colors.white);
-  const metricsY = 140;
-  const metricSpacing = 80;
+  const metricsY = 150;
   
   pdf.text(data.currentRevenue || '$2.5M', pageWidth/2 - 80, metricsY, { align: 'center' });
   pdf.text(data.totalCustomers || '450', pageWidth/2, metricsY, { align: 'center' });
   pdf.text(data.customerRetentionRate || '85%', pageWidth/2 + 80, metricsY, { align: 'center' });
   
   setFont(12, 'normal', colors.lightGray);
-  pdf.text('Revenue', pageWidth/2 - 80, metricsY + 8, { align: 'center' });
-  pdf.text('Customers', pageWidth/2, metricsY + 8, { align: 'center' });
-  pdf.text('Retention', pageWidth/2 + 80, metricsY + 8, { align: 'center' });
+  pdf.text('Revenue', pageWidth/2 - 80, metricsY + 10, { align: 'center' });
+  pdf.text('Customers', pageWidth/2, metricsY + 10, { align: 'center' });
+  pdf.text('Retention', pageWidth/2 + 80, metricsY + 10, { align: 'center' });
   
   // Modern date stamp
   setFont(14, 'normal', colors.lightGray);
   const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-  pdf.text(date, pageWidth / 2, pageHeight - 30, { align: 'center' });
+  pdf.text(date, pageWidth / 2, pageHeight - 20, { align: 'center' });
 
   // SLIDE 2: THE PROBLEM - Visual storytelling
   pdf.addPage();
@@ -195,21 +175,22 @@ export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
   setFont(48, 'bold', colors.white);
   pdf.text('THE PROBLEM', 30, 35);
   
-  // Problem statement in modern card
+  // Problem statement in modern card - Fixed sizing
   const cardY = 70;
+  const cardHeight = 100;
   pdf.setFillColor(colors.white.r, colors.white.g, colors.white.b);
   pdf.setDrawColor(colors.gray.r, colors.gray.g, colors.gray.b);
   pdf.setLineWidth(0.5);
-  roundedRect(pdf, 30, cardY, contentWidth, 80, 10, 'FD');
+  roundedRect(pdf, 30, cardY, contentWidth, cardHeight, 10, 'FD');
   
   // Add warning icon/accent
   pdf.setFillColor(colors.warning.r, colors.warning.g, colors.warning.b);
-  pdf.circle(50, cardY + 20, 8, 'F');
+  pdf.circle(50, cardY + 25, 8, 'F');
   setFont(16, 'bold', colors.white);
-  pdf.text('!', 50, cardY + 24, { align: 'center' });
+  pdf.text('!', 50, cardY + 29, { align: 'center' });
   
   setFont(20, 'bold', colors.dark);
-  pdf.text('Current home service industry challenges:', 70, cardY + 25);
+  pdf.text('Current home service industry challenges:', 70, cardY + 30);
   
   setFont(16, 'normal', colors.gray);
   const problems = [
@@ -218,13 +199,13 @@ export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
     '• 62% lack proper technology integration'
   ];
   
-  let problemY = cardY + 40;
+  let problemY = cardY + 50;
   problems.forEach(problem => {
     pdf.text(problem, 70, problemY);
-    problemY += 10;
+    problemY += 15; // Increased spacing
   });
 
-  // SLIDE 3: THE SOLUTION - Modern design
+  // SLIDE 3: THE SOLUTION - Fixed feature boxes
   pdf.addPage();
   
   // Split screen design
@@ -235,7 +216,7 @@ export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
   // Left side - Solution header
   setFont(48, 'bold', colors.white);
   pdf.text('THE', 30, 60);
-  pdf.text('SOLUTION', 30, 80);
+  pdf.text('SOLUTION', 30, 90);
   
   // Right side - Solution details
   setFont(24, 'bold', colors.dark);
@@ -248,24 +229,34 @@ export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
   );
   pdf.text(solutionText, pageWidth / 2 + 20, 60);
   
-  // Visual features with icons
+  // FIXED: Visual features with proper sized boxes
   const features = [
     { icon: '⚡', text: 'Instant deployment' },
     { icon: '📊', text: 'Real-time analytics' },
     { icon: '🔐', text: 'Enterprise security' }
   ];
   
-  let featureY = 100;
+  let featureY = 110;
+  const featureBoxWidth = 120;
+  const featureBoxHeight = 25;
+  
   features.forEach(feature => {
+    // Properly sized feature box
     pdf.setFillColor(colors.accent.r, colors.accent.g, colors.accent.b);
-    roundedRect(pdf, pageWidth / 2 + 20, featureY, 8, 8, 2, 'F');
+    roundedRect(pdf, pageWidth / 2 + 20, featureY, featureBoxWidth, featureBoxHeight, 5, 'F');
     
-    setFont(16, 'normal', colors.dark);
-    pdf.text(feature.text, pageWidth / 2 + 35, featureY + 6);
-    featureY += 20;
+    // Icon positioned properly within box
+    setFont(14, 'normal', colors.white);
+    pdf.text(feature.icon, pageWidth / 2 + 30, featureY + 16);
+    
+    // Text positioned properly within box
+    setFont(14, 'normal', colors.white);
+    pdf.text(feature.text, pageWidth / 2 + 45, featureY + 16);
+    
+    featureY += 35; // Better spacing between features
   });
 
-  // SLIDE 4: TRACTION - Data visualization
+  // SLIDE 4: TRACTION - Data visualization  
   pdf.addPage();
   pdf.setFillColor(colors.white.r, colors.white.g, colors.white.b);
   pdf.rect(0, 0, pageWidth, pageHeight, 'F');
@@ -332,26 +323,26 @@ export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
     };
 
     const chartImage = await createModernChart('bar', chartData, chartOptions, 1000, 600);
-    pdf.addImage(chartImage, 'PNG', 30, 50, 120, 80);
+    pdf.addImage(chartImage, 'PNG', 30, 60, 120, 80);
     
-    // Growth metric card
+    // Growth metric card - Fixed positioning
     const growth = revenues[2] > 0 && revenues[1] > 0 
       ? Math.round(((revenues[2] - revenues[1]) / revenues[1]) * 100)
       : 0;
     
     pdf.setFillColor(colors.success.r, colors.success.g, colors.success.b);
-    roundedRect(pdf, 170, 60, 100, 60, 10, 'F');
+    roundedRect(pdf, 170, 70, 100, 60, 10, 'F');
     
     setFont(48, 'bold', colors.white);
-    pdf.text(`+${growth}%`, 220, 90, { align: 'center' });
+    pdf.text(`+${growth}%`, 220, 100, { align: 'center' });
     setFont(16, 'normal', colors.white);
-    pdf.text('YoY Growth', 220, 105, { align: 'center' });
+    pdf.text('YoY Growth', 220, 115, { align: 'center' });
     
   } catch (error) {
     console.error('Chart error:', error);
   }
   
-  // Key metrics grid
+  // Key metrics grid - Fixed spacing and sizing
   const metricsGrid = [
     { label: 'Active Customers', value: data.totalCustomers || '450' },
     { label: 'Retention Rate', value: data.customerRetentionRate || '85%' },
@@ -360,27 +351,29 @@ export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
   ];
   
   let gridX = 30;
-  let gridY = 150;
+  let gridY = 160;
+  const metricBoxWidth = 120;
+  const metricBoxHeight = 25;
   
   metricsGrid.forEach((metric, index) => {
     if (index === 2) {
       gridX = 30;
-      gridY = 175;
+      gridY = 185;
     }
     
     pdf.setFillColor(colors.lightGray.r, colors.lightGray.g, colors.lightGray.b);
-    roundedRect(pdf, gridX, gridY, 120, 20, 5, 'F');
+    roundedRect(pdf, gridX, gridY, metricBoxWidth, metricBoxHeight, 5, 'F');
     
     setFont(12, 'normal', colors.gray);
-    pdf.text(metric.label, gridX + 10, gridY + 8);
+    pdf.text(metric.label, gridX + 10, gridY + 10);
     
     setFont(16, 'bold', colors.dark);
-    pdf.text(metric.value, gridX + 110, gridY + 13, { align: 'right' });
+    pdf.text(metric.value, gridX + metricBoxWidth - 10, gridY + 18, { align: 'right' });
     
     gridX += 130;
   });
 
-  // SLIDE 5: MARKET OPPORTUNITY
+  // SLIDE 5: MARKET OPPORTUNITY - Fixed overlapping text
   pdf.addPage();
   
   // Gradient background
@@ -393,9 +386,9 @@ export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
   setFont(48, 'bold', colors.dark);
   pdf.text('MARKET OPPORTUNITY', pageWidth / 2, 50, { align: 'center' });
   
-  // TAM SAM SOM visualization
+  // TAM SAM SOM visualization - Better positioning
   const centerX = pageWidth / 2;
-  const centerY = pageHeight / 2 + 10;
+  const centerY = pageHeight / 2;
   
   // TAM circle - lightest
   pdf.setFillColor(230, 228, 246); // Light purple
@@ -409,24 +402,24 @@ export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
   pdf.setFillColor(colors.primary.r, colors.primary.g, colors.primary.b);
   pdf.circle(centerX, centerY, 20, 'F');
   
-  // Labels
+  // Labels - Better positioning to avoid overlap
   setFont(16, 'bold', colors.dark);
-  pdf.text('TAM: $12.5B', centerX - 80, centerY - 40);
-  pdf.text('SAM: $3.2B', centerX - 80, centerY);
-  pdf.text('SOM: $500M', centerX - 80, centerY + 40);
+  pdf.text('TAM: $12.5B', centerX - 100, centerY - 50);
+  pdf.text('SAM: $3.2B', centerX - 100, centerY - 10);
+  pdf.text('SOM: $500M', centerX - 100, centerY + 30);
   
-  // Market insights
+  // Market insights - Proper spacing
   const insights = [
     '• Home services growing 18% annually',
-    '• Digital transformation accelerating',
+    '• Digital transformation accelerating', 
     '• Consolidation opportunities abundant'
   ];
   
   setFont(14, 'normal', colors.gray);
-  let insightY = 140;
+  let insightY = 160;
   insights.forEach(insight => {
     pdf.text(insight, 30, insightY);
-    insightY += 10;
+    insightY += 15; // Better spacing
   });
 
   // SLIDE 6: BUSINESS MODEL
@@ -438,33 +431,36 @@ export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
   setFont(48, 'bold', colors.dark);
   pdf.text('BUSINESS MODEL', 30, 40);
   
-  // Revenue streams visualization
+  // Revenue streams visualization - Fixed overlapping text
   const streams = [
     { name: 'Subscription Revenue', percent: 65, color: colors.primary },
     { name: 'Transaction Fees', percent: 25, color: colors.secondary },
     { name: 'Add-on Services', percent: 10, color: colors.accent }
   ];
   
-  let streamY = 60;
+  let streamY = 70;
+  const streamBarWidth = 200;
+  const streamBarHeight = 35;
+  
   streams.forEach(stream => {
     // Background bar
     pdf.setFillColor(colors.white.r, colors.white.g, colors.white.b);
-    roundedRect(pdf, 30, streamY, 200, 30, 5, 'F');
+    roundedRect(pdf, 30, streamY, streamBarWidth, streamBarHeight, 5, 'F');
     
     // Progress bar
     pdf.setFillColor(stream.color.r, stream.color.g, stream.color.b);
-    roundedRect(pdf, 30, streamY, 200 * (stream.percent / 100), 30, 5, 'F');
+    roundedRect(pdf, 30, streamY, streamBarWidth * (stream.percent / 100), streamBarHeight, 5, 'F');
     
-    // Text
+    // Text positioned properly within bars
     setFont(14, 'bold', colors.dark);
-    pdf.text(stream.name, 40, streamY + 12);
+    pdf.text(stream.name, 40, streamY + 15);
     setFont(16, 'bold', colors.white);
-    pdf.text(`${stream.percent}%`, 40, streamY + 22);
+    pdf.text(`${stream.percent}%`, 40, streamY + 28);
     
-    streamY += 40;
+    streamY += 45; // Better spacing
   });
   
-  // Key metrics cards
+  // Key metrics cards - Fixed positioning
   const bizMetrics = [
     { label: 'LTV:CAC Ratio', value: '3.2:1', icon: '📈' },
     { label: 'Gross Margin', value: data.profitMargin || '68%', icon: '💰' },
@@ -472,19 +468,23 @@ export const generateSiliconValleyPitchDeck = async (data: PitchDeckData) => {
   ];
   
   let cardX = 250;
+  const cardWidth = 80;
+  const bizCardHeight = 70;
+  
   bizMetrics.forEach(metric => {
     pdf.setFillColor(colors.white.r, colors.white.g, colors.white.b);
     pdf.setDrawColor(colors.gray.r, colors.gray.g, colors.gray.b);
-    roundedRect(pdf, cardX, 60, 80, 60, 10, 'FD');
+    roundedRect(pdf, cardX, 70, cardWidth, bizCardHeight, 10, 'FD');
     
     setFont(24, 'normal', colors.gray);
-    pdf.text(metric.icon, cardX + 40, 80, { align: 'center' });
+    pdf.text(metric.icon, cardX + cardWidth/2, 90, { align: 'center' });
     
     setFont(18, 'bold', colors.dark);
-    pdf.text(metric.value, cardX + 40, 95, { align: 'center' });
+    pdf.text(metric.value, cardX + cardWidth/2, 105, { align: 'center' });
     
     setFont(10, 'normal', colors.gray);
-    pdf.text(metric.label, cardX + 40, 105, { align: 'center' });
+    const labelLines = pdf.splitTextToSize(metric.label, cardWidth - 10);
+    pdf.text(labelLines, cardX + cardWidth/2, 120, { align: 'center' });
     
     cardX += 90;
   });

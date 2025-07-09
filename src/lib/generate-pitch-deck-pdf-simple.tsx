@@ -450,7 +450,7 @@ export function generatePitchDeckPDF(data: PitchDeckData): jsPDF {
   drawRect(margin + 20, 200, contentWidth - 40, 50);
   
   pdf.setFontSize(12);
-  setColor(grayColor);
+  setColor({ r: 100, g: 100, b: 100 });
   addText('Contact us through the', pageWidth / 2, 220, { align: 'center' });
   
   pdf.setFontSize(18);
