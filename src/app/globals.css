@@ -14,32 +14,67 @@
 }
 
 
-/* Ocean Animations */
-@keyframes deepRise {
-  0%, 100% { 
-    transform: translateY(200px) scale(2, 0.6);
+/* Luxury Animations */
+@keyframes fadeInUp {
+  from {
     opacity: 0;
+    transform: translateY(30px);
   }
-  20% {
+  to {
     opacity: 1;
-  }
-  50% { 
-    transform: translateY(-100px) scale(2, 0.6);
-    opacity: 1;
-  }
-  80% {
-    opacity: 0;
+    transform: translateY(0);
   }
 }
 
-@keyframes gentleWave {
-  0%, 100% { transform: translateY(0) scaleY(0.5); }
-  50% { transform: translateY(-30px) scaleY(0.7); }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-@keyframes lightShift {
-  0%, 100% { opacity: 1; transform: rotate(5deg) translateX(0); }
-  50% { opacity: 0.6; transform: rotate(3deg) translateX(20px); }
+@keyframes subtleFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Animation utilities */
+.animate-fadeInUp {
+  animation: fadeInUp 1.2s ease-out;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 1.5s ease-out;
+}
+
+.animate-subtleFloat {
+  animation: subtleFloat 6s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(251, 191, 36, 0.1) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
 }
 
 @layer base {
@@ -66,7 +101,7 @@
     --bg-light: #374151;
     
     /* Typography - High contrast text colors */
-    --text-primary: rgba(255, 255, 255, 0.9);
+    --text-primary: #E8E6E3;
     --text-secondary: rgba(255, 255, 255, 0.6);
     --text-disabled: rgba(255, 255, 255, 0.38);
     
@@ -213,4 +248,99 @@ html {
 
 .btn-danger:hover {
   background-color: #DC2626;
+}
+
+/* Luxury scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-carbon-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(251, 191, 36, 0.3);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(251, 191, 36, 0.5);
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection styling */
+::selection {
+  background-color: rgba(251, 191, 36, 0.2);
+  color: var(--text-primary);
+}
+
+/* Parallax and Premium Animations */
+@keyframes parallaxFloat {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.02);
+  }
+}
+
+@keyframes goldShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Premium hover states */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Scroll reveal animations */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Gold text gradient */
+.text-gradient-gold {
+  background: linear-gradient(
+    135deg,
+    #f59e0b 0%,
+    #fbbf24 50%,
+    #f59e0b 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: goldShimmer 3s linear infinite;
 }
