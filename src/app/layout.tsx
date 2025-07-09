@@ -16,8 +16,14 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RemoteOps - Business Management Platform",
-  description: "Professional business management and remote operations platform",
+  title: "APEX Remote Operations - Master Location-Independent Business",
+  description: "The Remote Operations Certification That Generated $2M+ in Revenue. Learn to build scalable, sellable location-independent businesses with PADI-style progression and AI mentorship.",
+  keywords: "remote operations, location independent business, remote contractor, business exit strategy, remote team management, APEX certification",
+  openGraph: {
+    title: "APEX Remote Operations Certification",
+    description: "Master remote operations like a PADI diver. Build your 7-figure location-independent contracting empire.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
