@@ -175,7 +175,7 @@ export default function Home() {
               className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black px-8 py-4 sm:px-10 sm:py-5 text-base font-medium rounded-2xl transition-all duration-300 hover:shadow-[0_20px_40px_-12px_rgba(251,191,36,0.3)] hover:scale-[1.02] uppercase tracking-wider w-full sm:w-auto"
               asChild
             >
-              <Link href="/auth/sign-up">
+              <Link href="/apply">
                 Request Invitation
               </Link>
             </Button>
@@ -750,7 +750,7 @@ export default function Home() {
               className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black px-10 py-4 text-base font-medium rounded-2xl transition-all duration-300 hover:shadow-[0_20px_40px_-12px_rgba(251,191,36,0.3)] hover:scale-[1.02] uppercase tracking-wider"
               asChild
             >
-              <Link href="/auth/sign-up">
+              <Link href="/apply">
                 Request Invitation
               </Link>
             </Button>
@@ -1152,7 +1152,7 @@ export default function Home() {
               className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black px-10 py-4 text-base font-medium rounded-2xl transition-all duration-300 hover:shadow-[0_20px_40px_-12px_rgba(251,191,36,0.3)] hover:scale-[1.02] uppercase tracking-wider w-full sm:w-auto"
               asChild
             >
-              <Link href="/auth/sign-up">
+              <Link href="/apply">
                 Request Invitation
               </Link>
             </Button>
