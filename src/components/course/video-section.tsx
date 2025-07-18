@@ -79,13 +79,14 @@ export function VideoSection({
   }, [isCountingDown, nextModuleUrl, router]);
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <UnifiedVideoPlayer 
         videoUrl={videoUrl}
         moduleId={moduleId}
         userId={userId}
         initialProgress={initialProgress}
         onComplete={handleVideoComplete}
+        className="w-full"
       />
       
       {/* Continue to next module overlay */}

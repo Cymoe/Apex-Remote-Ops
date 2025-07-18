@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Progress } from '@/components/ui/progress';
 import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 interface UnifiedVideoPlayerProps {
   videoUrl: string;
@@ -26,6 +28,7 @@ export function UnifiedVideoPlayer({
   const [progress, setProgress] = useState(0);
   const [lastSavedTime, setLastSavedTime] = useState(initialProgress);
   const [hasCompleted, setHasCompleted] = useState(false);
+  const [hasError, setHasError] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressSaveInterval = useRef<NodeJS.Timeout | null>(null);
@@ -39,6 +42,26 @@ export function UnifiedVideoPlayer({
   const embedUrl = isLoomVideo && videoUrl.includes('/share/') 
     ? videoUrl.replace('/share/', '/embed/')
     : videoUrl;
+
+  // Check initial completion status
+  useEffect(() => {
+    const checkCompletionStatus = async () => {
+      if (!userId) return;
+      
+      const { data } = await supabase
+        .from('user_progress')
+        .select('completed')
+        .eq('user_id', userId)
+        .eq('module_id', moduleId)
+        .single();
+      
+      if (data?.completed) {
+        setHasCompleted(true);
+      }
+    };
+    
+    checkCompletionStatus();
+  }, [userId, moduleId]);
 
   // Save progress to database
   const saveProgress = async (currentTime: number, completed = false) => {
@@ -127,8 +150,8 @@ export function UnifiedVideoPlayer({
   if (isLoomVideo) {
     // Render Loom iframe
     return (
-      <div className={`relative ${className}`}>
-        <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
+      <div className={`relative w-full ${className}`}>
+        <div className="aspect-video bg-black rounded-lg overflow-hidden relative w-full">
           <iframe
             src={embedUrl}
             width="100%"
@@ -137,26 +160,61 @@ export function UnifiedVideoPlayer({
             allowFullScreen
             className="w-full h-full"
             onLoad={() => setIsLoading(false)}
+            onError={() => {
+              setIsLoading(false);
+              setHasError(true);
+            }}
           />
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-black">
-              <Loader2 className="h-8 w-8 text-white animate-spin" />
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="h-12 w-12 text-white animate-spin" />
+                <p className="text-white text-sm">Loading video...</p>
+              </div>
             </div>
           )}
-          
+          {hasError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/90">
+              <div className="text-center space-y-3">
+                <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto">
+                  <X className="w-8 h-8 text-red-500" />
+                </div>
+                <div>
+                  <p className="text-white font-medium mb-1">Video failed to load</p>
+                  <p className="text-gray-400 text-sm">The video might be unavailable or deleted</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         
+        {/* Progress indicator for Loom videos */}
+        {userId && (
+          <div className="mt-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">
+                {hasCompleted ? '✓ Completed' : 'In Progress'}
+              </span>
+              <span className="text-muted-foreground">
+                Duration: 5 min
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
   // Render HTML5 video player
   return (
-    <div className={`relative ${className}`}>
-      <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
+    <div className={`relative w-full ${className}`}>
+      <div className="aspect-video bg-black rounded-lg overflow-hidden relative w-full">
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center z-10">
-            <Loader2 className="h-8 w-8 text-white animate-spin" />
+          <div className="absolute inset-0 flex items-center justify-center bg-black">
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 className="h-12 w-12 text-white animate-spin" />
+              <p className="text-white text-sm">Loading video...</p>
+            </div>
           </div>
         )}
         <video

@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Save, Video } from 'lucide-react';
+import { Loader2, Save, Video, Image } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface ModuleVideoFormProps {
@@ -18,9 +18,43 @@ export function ModuleVideoForm({ module }: ModuleVideoFormProps) {
   const router = useRouter();
   const supabase = createClient();
   const [loading, setLoading] = useState(false);
+  const [fetchingThumbnail, setFetchingThumbnail] = useState(false);
   const [videoUrl, setVideoUrl] = useState(module.video_url || '');
+  const [thumbnailUrl, setThumbnailUrl] = useState(module.thumbnail_url || '');
   const [tagline, setTagline] = useState(module.tagline || '');
   const [description, setDescription] = useState(module.description || '');
+
+  // Automatically fetch Loom thumbnail when URL changes
+  useEffect(() => {
+    const fetchLoomThumbnail = async () => {
+      if (!videoUrl.includes('loom.com/share/') || videoUrl.length < 40) return;
+      
+      setFetchingThumbnail(true);
+      try {
+        const response = await fetch('/api/fetch-loom-metadata', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoUrl })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.thumbnailUrl) {
+            setThumbnailUrl(data.thumbnailUrl);
+            console.log('Loom thumbnail fetched:', data.thumbnailUrl);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch Loom thumbnail:', error);
+      } finally {
+        setFetchingThumbnail(false);
+      }
+    };
+
+    // Debounce the fetch to avoid too many requests
+    const timeoutId = setTimeout(fetchLoomThumbnail, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [videoUrl]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,12 +74,14 @@ export function ModuleVideoForm({ module }: ModuleVideoFormProps) {
 
       console.log('Updating module:', module.id);
       console.log('Video URL:', embedUrl);
+      console.log('Thumbnail URL:', thumbnailUrl);
       console.log('Description:', description);
 
       const { data, error } = await supabase
         .from('modules')
         .update({
           video_url: embedUrl || null,
+          thumbnail_url: thumbnailUrl || null,
           tagline: tagline || null,
           description: description || null,
         })
@@ -108,6 +144,32 @@ export function ModuleVideoForm({ module }: ModuleVideoFormProps) {
         </div>
         <p className="text-xs text-medium-gray">
           Paste your Loom share link - we'll automatically convert it to embed format
+          {fetchingThumbnail && " and fetch the thumbnail"}
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor={`thumbnail-${module.id}`} className="text-light-gray">
+          Thumbnail URL {fetchingThumbnail && <span className="text-professional-blue">(fetching...)</span>}
+        </Label>
+        <div className="flex items-center gap-2">
+          <Input
+            id={`thumbnail-${module.id}`}
+            type="url"
+            value={thumbnailUrl}
+            onChange={(e) => setThumbnailUrl(e.target.value)}
+            placeholder="Auto-filled for Loom videos"
+            className="bg-deep-black border-slate-gray text-pure-white"
+          />
+          {thumbnailUrl && (
+            <Badge variant="secondary" className="shrink-0">
+              <Image className="w-3 h-3 mr-1" />
+              Has Thumbnail
+            </Badge>
+          )}
+        </div>
+        <p className="text-xs text-medium-gray">
+          Automatically fetched for Loom videos, or paste a custom thumbnail URL
         </p>
       </div>
 

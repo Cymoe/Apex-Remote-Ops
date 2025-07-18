@@ -143,6 +143,7 @@
     --input: var(--bg-light);
     --ring: var(--color-professional-blue);
     --radius: 0.5rem;
+    --header-height: 8rem;
   }
 
   .dark {

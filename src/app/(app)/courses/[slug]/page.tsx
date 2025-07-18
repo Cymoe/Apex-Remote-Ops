@@ -12,12 +12,16 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  Lock
+  Lock,
+  Menu
 } from 'lucide-react';
 import Link from 'next/link';
 import { VideoSection } from '@/components/course/video-section';
 import ProgressTracker from '@/components/progress-tracker';
 import { CourseHeader } from '@/components/course/course-header';
+import { EmptyModuleSection } from '@/components/course/empty-module-section';
+import { EnhancedSidebar } from '@/components/course/enhanced-sidebar';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -140,99 +144,119 @@ export default async function CourseDetailPage({ params, searchParams }: CourseD
   const isPreviousModuleCompleted = isModuleAccessible;
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Course Header */}
-      <CourseHeader
-        courseTitle={course.title}
-        courseDescription={course.description}
-        initialCompletedCount={completedModules}
-        totalModules={modules.length}
-      />
-
-      <Separator />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
-        {/* Main Content Area */}
-        <div className="lg:col-span-2 space-y-2">
-          {/* Navigation Bar - Above video */}
-          <div className="bg-muted/50 rounded-lg p-3">
-            <div className="flex items-center justify-between gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                disabled={!previousModule}
-              >
-                <Link href={previousModule ? `/courses/${resolvedParams.slug}?module=${previousModule.slug}` : '#'}>
-                  <ChevronLeft className="w-4 h-4 mr-1" />
-                  Previous
-                </Link>
+    <div className="-m-4 sm:-m-6 lg:-m-8">
+      {/* Mobile Course Navigation */}
+      <div className="lg:hidden sticky top-0 z-50 bg-background border-b border-border">
+        <div className="p-4">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="w-full">
+                <Menu className="w-4 h-4 mr-2" />
+                Course Content ({currentModuleIndex + 1}/{modules.length})
               </Button>
-              
-              <div className="flex items-center gap-3 text-sm">
-                <span className="text-muted-foreground">Module {currentModuleIndex + 1} of {modules.length}</span>
-                {isPreviousModuleCompleted && userId && (
-                  <>
-                    <span className="text-muted-foreground">•</span>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0">
+              <EnhancedSidebar
+                modules={modules}
+                currentModuleId={currentModule.id}
+                userProgress={userProgress}
+                courseSlug={resolvedParams.slug}
+                highestCompletedIndex={highestCompletedIndex}
+              />
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+
+      {/* Course Sidebar - Desktop */}
+      <aside className="hidden lg:block w-80 fixed top-0 left-64 bottom-0 border-r border-border overflow-y-auto bg-background z-40">
+        <EnhancedSidebar
+          modules={modules}
+          currentModuleId={currentModule.id}
+          userProgress={userProgress}
+          courseSlug={resolvedParams.slug}
+          highestCompletedIndex={highestCompletedIndex}
+        />
+      </aside>
+
+      {/* Main Content - responsive padding and margins */}
+      <main className="lg:ml-80 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 min-h-screen bg-background">
+        {/* Course Header */}
+        <div className="mb-4 sm:mb-6 lg:mb-8">
+          <CourseHeader
+            courseTitle={course.title}
+            courseDescription={course.description}
+            initialCompletedCount={completedModules}
+            totalModules={modules.length}
+          />
+        </div>
+
+        {/* Navigation Bar */}
+        <div className="bg-muted/50 rounded-lg p-3 sm:p-4 border border-border/50 mb-4 sm:mb-6">
+          <div className="flex items-center justify-between gap-2 sm:gap-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              asChild
+              disabled={!previousModule}
+              className="text-xs sm:text-sm"
+              title={previousModule ? `Previous: ${previousModule.title}` : undefined}
+            >
+              <Link href={previousModule ? `/courses/${resolvedParams.slug}?module=${previousModule.slug}` : '#'}>
+                <ChevronLeft className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Previous</span>
+              </Link>
+            </Button>
+            
+            <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
+              <span className="text-muted-foreground font-medium">Module {currentModuleIndex + 1} of {modules.length}</span>
+              {isPreviousModuleCompleted && userId && (
+                <>
+                  <span className="text-muted-foreground hidden sm:inline">•</span>
+                  <div className="hidden sm:block">
                     <ProgressTracker
                       moduleId={currentModule.id}
-                      userId={userId}
+                      userId={userId ?? ''}
                       isCompleted={userProgress.get(currentModule.id)?.completed || false}
                     />
-                  </>
-                )}
-              </div>
-              
-              <Button
-                size="sm"
-                asChild
-                disabled={!nextModule}
-                className="bg-primary hover:bg-primary/90"
-              >
-                <Link href={nextModule ? `/courses/${resolvedParams.slug}?module=${nextModule.slug}` : '#'}>
-                  Next
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-
-          {/* Video Player */}
-          <Card>
-            <CardContent className="p-0">
-              {!isPreviousModuleCompleted ? (
-                <div className="aspect-video bg-muted flex items-center justify-center">
-                  <div className="text-center space-y-4">
-                    <Lock className="w-12 h-12 text-muted-foreground mx-auto" />
-                    <div>
-                      <h3 className="font-semibold">Module Locked</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Complete the previous module to unlock this content
-                      </p>
-                    </div>
-                    {previousModule && (
-                      <Button asChild>
-                        <Link href={`/courses/${resolvedParams.slug}?module=${previousModule.slug}`}>
-                          Go to Previous Module
-                        </Link>
-                      </Button>
-                    )}
                   </div>
-                </div>
-              ) : currentModule.video_url && userId ? (
-                <VideoSection 
+                </>
+              )}
+            </div>
+            
+            <Button
+              size="sm"
+              asChild
+              disabled={!nextModule}
+              className="bg-primary hover:bg-primary/90 text-xs sm:text-sm"
+              title={nextModule ? `Next: ${nextModule.title}` : undefined}
+            >
+              <Link href={nextModule ? `/courses/${resolvedParams.slug}?module=${nextModule.slug}` : '#'}>
+                <span className="hidden sm:inline">Next</span>
+                <ChevronRight className="w-4 h-4 ml-1 sm:ml-2" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Video Section */}
+        <Card className="mb-4 sm:mb-6 lg:mb-8 w-full border-0 shadow-lg">
+            <CardContent className="p-0">
+              {currentModule.video_url ? (
+                <VideoSection
                   videoUrl={currentModule.video_url}
                   moduleId={currentModule.id}
-                  userId={userId}
+                  userId={userId ?? ''}
                   initialProgress={userProgress.get(currentModule.id)?.last_watched_position}
-                  nextModuleUrl={nextModule ? `/courses/${resolvedParams.slug}?module=${nextModule.slug}` : undefined}
-                  nextModuleTitle={nextModule?.title}
-                  isCompleted={userProgress.get(currentModule.id)?.completed}
+                  isCompleted={userProgress.get(currentModule.id)?.completed || false}
                 />
               ) : (
-                <div className="aspect-video bg-muted flex items-center justify-center">
-                  <p className="text-muted-foreground">No video available for this module</p>
-                </div>
+                <EmptyModuleSection
+                  moduleId={currentModule.id}
+                  userId={userId ?? ''}
+                  isCompleted={userProgress.get(currentModule.id)?.completed || false}
+                  courseSlug={resolvedParams.slug}
+                />
               )}
             </CardContent>
           </Card>
@@ -240,28 +264,20 @@ export default async function CourseDetailPage({ params, searchParams }: CourseD
           {/* Module Info */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold">{currentModule.title}</h2>
+              <h1 className="text-3xl font-bold leading-tight">{currentModule.title}</h1>
               {currentModule.tagline && (
                 <p className="text-lg text-muted-foreground italic">{currentModule.tagline}</p>
               )}
             </div>
             
             {currentModule.description && (
-              <p className="text-muted-foreground">{currentModule.description}</p>
+              <p className="text-muted-foreground leading-relaxed">{currentModule.description}</p>
             )}
-
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span className="flex items-center">
-                <FileText className="w-4 h-4 mr-1" />
-                Module {currentModuleIndex + 1} of {modules.length}
-              </span>
-            </div>
-
           </div>
 
           {/* Module Resources */}
           {currentModule.resources && currentModule.resources.length > 0 && (
-            <Card>
+            <Card className="mt-8">
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Resources</h3>
                 <div className="space-y-2">
@@ -281,64 +297,7 @@ export default async function CourseDetailPage({ params, searchParams }: CourseD
               </CardContent>
             </Card>
           )}
-        </div>
-
-        {/* Sidebar - Module List */}
-        <div className="space-y-4">
-          <h3 className="font-semibold">Course Content</h3>
-          <div className="space-y-2">
-            {modules.map((module, index) => {
-              const isCompleted = userProgress.get(module.id)?.completed;
-              const isLocked = index > 0 && index > highestCompletedIndex + 1;
-              const isCurrent = module.id === currentModule.id;
-              
-              const content = (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {isCompleted ? (
-                      <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    ) : isLocked ? (
-                      <Lock className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                    ) : (
-                      <PlayCircle className={`w-5 h-5 flex-shrink-0 ${isCurrent ? 'text-primary' : 'text-muted-foreground'}`} />
-                    )}
-                    <span className={`text-sm ${isCurrent ? 'font-semibold text-primary' : ''}`}>
-                      {index + 1}. {module.title}
-                    </span>
-                  </div>
-                </div>
-              );
-
-              if (isLocked) {
-                return (
-                  <div
-                    key={module.id}
-                    className="block p-3 rounded-lg border transition-all opacity-50 cursor-not-allowed border-transparent"
-                  >
-                    {content}
-                  </div>
-                );
-              }
-
-              return (
-                <Link
-                  key={module.id}
-                  href={`/courses/${resolvedParams.slug}?module=${module.slug}`}
-                  className={`
-                    block p-3 rounded-lg border transition-all cursor-pointer
-                    ${isCurrent 
-                      ? 'bg-primary/10 border-primary' 
-                      : 'hover:bg-muted/50 border-transparent'
-                    }
-                  `}
-                >
-                  {content}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
+        </main>
       </div>
-    </div>
-  );
+    );
 }

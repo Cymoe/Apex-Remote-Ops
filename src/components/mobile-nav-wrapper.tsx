@@ -1,7 +1,7 @@
-import { SidebarContent } from './sidebar-content';
 import { createClient } from '@/lib/supabase/server';
+import { MobileNav } from './mobile-nav';
 
-export async function Sidebar() {
+export async function MobileNavWrapper() {
   let user = null;
   
   try {
@@ -19,8 +19,8 @@ export async function Sidebar() {
       }
     }
   } catch (error) {
-    console.error('Sidebar component error:', error);
+    console.error('MobileNavWrapper component error:', error);
   }
 
-  return <SidebarContent user={user} />;
-}
+  return <MobileNav user={user} />;
+} 
