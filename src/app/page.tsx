@@ -1,1231 +1,664 @@
 'use client';
 
-import { redirect } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import Image from 'next/image';
 import { ApexLogo } from '@/components/apex-logo';
-import { useState, useEffect } from 'react';
+import { Shield, Lock, Users, TrendingUp, CheckCircle, MapPin, Award, Building2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  const [showExitIntent, setShowExitIntent] = useState(false);
-  const [showInviteCode, setShowInviteCode] = useState(false);
-  const [inviteCode, setInviteCode] = useState('');
-
+  const router = useRouter();
+  const [availableSpots, setAvailableSpots] = useState(2);
+  const [totalOperators, setTotalOperators] = useState(3);
+  const [avgMonthlyRevenue, setAvgMonthlyRevenue] = useState(42000);
+  
+  // Simulate live updates
   useEffect(() => {
-    // Check auth status
-    const checkAuth = async () => {
-      try {
-        const { createClient } = await import('@/lib/supabase/client');
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (user) {
-          redirect('/dashboard');
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
+    const interval = setInterval(() => {
+      if (Math.random() > 0.8 && availableSpots > 3) {
+        setAvailableSpots(prev => prev - 1);
       }
-    };
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [availableSpots]);
 
-    checkAuth();
-
-    // Exit intent
-    let hasShownExitIntent = false;
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0 && !hasShownExitIntent) {
-        hasShownExitIntent = true;
-        setShowExitIntent(true);
-      }
-    };
-
-    document.addEventListener('mouseleave', handleMouseLeave);
-    return () => {
-      document.removeEventListener('mouseleave', handleMouseLeave);
-    };
-  }, []);
-
-  const handleInviteCodeSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (inviteCode) {
-      window.location.href = `/auth/sign-up?invite=${inviteCode}`;
-    }
+  const handleApply = () => {
+    router.push('/apply');
   };
 
   return (
-    <>
-      {/* Exit Intent Modal */}
-      {showExitIntent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowExitIntent(false)} />
-          <div className="relative bg-gradient-to-b from-gray-900 to-black border border-amber-500/20 rounded-2xl p-8 sm:p-12 max-w-md w-full shadow-[0_0_100px_rgba(251,191,36,0.2)]">
-            <button 
-              onClick={() => setShowExitIntent(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-300 text-2xl"
-            >
-              ×
-            </button>
-            
-            <div className="text-center space-y-6">
-              <div className="text-amber-500 text-5xl">⚠️</div>
-              <h3 className="font-serif text-2xl sm:text-3xl font-light">
-                Access Expires Soon
-              </h3>
-              <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
-                This page will not be available after your session expires. 
-                Only those with invitation codes can bypass the waiting list.
-              </p>
-              <div className="pt-4">
-                <Button 
-                  size="lg"
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black px-6 py-3 rounded-xl font-medium w-full"
-                  onClick={() => {
-                    setShowExitIntent(false);
-                    document.getElementById('cta-button')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  Secure My Position
-                </Button>
-              </div>
-              <p className="text-xs text-gray-600 font-mono">
-                Session expires in 14:59
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="min-h-screen bg-gradient-to-b from-black via-[#0a0a0a] to-black relative animate-fadeIn">
-      {/* Subtle noise texture overlay */}
-      <div className="fixed inset-0 opacity-[0.015] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }}
-      />
-      
+    <div className="min-h-screen bg-white text-gray-900">
       {/* Header */}
-      <header className="relative z-20 px-4 pt-8 animate-fadeInUp">
-        <div className="max-w-7xl mx-auto flex flex-col items-center">
-          <ApexLogo size="md" className="[&_div[class*='from-professional-blue']]:from-amber-500 [&_div[class*='to-professional-blue']]:to-amber-600 [&_div[class*='border-professional-blue']]:border-amber-500 [&_div[class*='text-professional-blue']]:text-amber-500" />
+      <header className="px-4 py-6 border-b border-gray-200 sticky top-0 bg-white z-50">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <ApexLogo size="md" className="[&_div]:from-black [&_div]:to-gray-800" />
+          <div className="flex items-center gap-6">
+            <div className="hidden sm:flex items-center gap-2 text-sm">
+              <span className="text-gray-600">Q4 Spots:</span>
+              <span className="font-bold text-red-600">{availableSpots} remaining</span>
+            </div>
+            <Link 
+              href="/auth/sign-in" 
+              className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+            >
+              Operator Login
+            </Link>
+          </div>
         </div>
       </header>
-      
+
+
       {/* Hero Section */}
-      <section className="relative flex items-center justify-center px-4 pt-16 sm:pt-20 md:pt-24 pb-20 sm:pb-28 md:pb-36">
-        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8">
-          {/* Video */}
-          <div className="relative max-w-2xl mx-auto mb-8 sm:mb-10 animate-fadeInUp" style={{animationDelay: '0.2s'}}>
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-amber-600/10 blur-3xl opacity-50 animate-subtleFloat"></div>
-            <div className="relative bg-gradient-to-b from-gray-900 to-gray-950 rounded-xl sm:rounded-2xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] border border-gray-800/50">
-              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
-                <iframe
-                  src="https://www.loom.com/embed/c954a298a53c45dfb558460b77a79552?sid=b3f44326-8b4d-4f07-99d7-834091792472"
-                  allowFullScreen
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    border: 'none',
-                  }}
-                />
-              </div>
-              {/* Unmute indicator */}
-              <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 bg-black/60 backdrop-blur-md px-2 py-1 sm:px-4 sm:py-2 rounded-full text-xs font-mono tracking-wider text-gray-300">
-                ▶ UNMUTE
-              </div>
-            </div>
-          </div>
+      <section className="py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold mb-8 leading-tight">
+              Build a $30K+/Month<br />
+              <span className="text-gray-900 font-bold">Property Renovation Business</span><br />
+              <span className="text-gray-600 font-normal">Without Ever Going On-Site</span>
+            </h1>
+            <p className="text-base md:text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
+              Be the broker. Hire crews for painting, flooring, concrete, or remodeling jobs. 
+              You handle sales. They do the work. You keep 40-60% profit.
+            </p>
 
-          {/* Authority Bar */}
-          <div className="flex flex-wrap justify-center gap-6 sm:gap-10 text-sm font-mono text-gray-400 mb-8 animate-fadeIn" style={{animationDelay: '0.4s'}}>
-            <div className="flex items-center gap-2">
-              <span className="text-amber-500">✓</span>
-              <span>Proven System</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-amber-500">✓</span>
-              <span>$3M+ Generated</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-amber-500">✓</span>
-              <span>12-Week Program</span>
-            </div>
-          </div>
 
-          {/* Headline */}
-          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight leading-[1.2] tracking-tight animate-fadeInUp" style={{animationDelay: '0.6s'}}>
-            Launch a $10K/month<br />
-            home service empire
-          </h1>
-
-          {/* Subheadline */}
-          <p className="text-lg sm:text-xl text-gray-400/80 max-w-2xl mx-auto tracking-wide font-extralight leading-relaxed">
-            Build and operate location-independent<br />
-            service businesses from anywhere in the world.
-          </p>
-
-          {/* CTA Button */}
-          <div className="pt-4">
-            <Button 
-              id="cta-button"
-              size="lg" 
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black px-8 py-4 sm:px-10 sm:py-5 text-base font-medium rounded-2xl transition-all duration-300 hover:shadow-[0_20px_40px_-12px_rgba(251,191,36,0.3)] hover:scale-[1.02] uppercase tracking-wider w-full sm:w-auto"
-              asChild
-            >
-              <Link href="/apply">
-                Request Invitation
-              </Link>
-            </Button>
-            
-            {/* Invitation Code */}
-            <div className="mt-4">
-              {!showInviteCode ? (
-                <button 
-                  onClick={() => setShowInviteCode(true)}
-                  className="text-xs text-gray-500 hover:text-amber-500 transition-colors font-mono tracking-wider"
-                >
-                  Have an invitation code?
-                </button>
-              ) : (
-                <form onSubmit={handleInviteCodeSubmit} className="flex gap-2 justify-center animate-fadeIn">
-                  <input
-                    type="text"
-                    value={inviteCode}
-                    onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                    placeholder="ENTER CODE"
-                    className="bg-gray-900 border border-gray-700 rounded px-3 py-1 text-xs font-mono uppercase tracking-wider focus:border-amber-500 focus:outline-none transition-colors w-28"
-                    maxLength={8}
-                    autoFocus
-                  />
-                  <button
-                    type="submit"
-                    className="text-xs text-amber-500 hover:text-amber-400 font-mono"
-                  >
-                    →
-                  </button>
-                </form>
-              )}
+            {/* CTA */}
+            <div>
+              <Button 
+                onClick={handleApply}
+                className="bg-gray-900 hover:bg-black text-white px-8 py-6 text-base font-medium rounded-md transition-colors"
+              >
+                Apply Now →
+              </Button>
+              <p className="text-sm text-gray-500 mt-4">
+                $97 application • 3-minute form
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                New territories open based on population and service type
+              </p>
             </div>
-          </div>
-
-          {/* Exclusivity Indicators */}
-          <div className="space-y-3 text-sm text-gray-400 font-mono">
-            <p className="tracking-wider text-amber-500/80">[ 5 ] Positions Remaining</p>
-            <p className="text-xs opacity-60">By Invitation Only • 12-Week Intensive</p>
-            <p className="text-xs opacity-50">Previous Applicants: 2,847 | Accepted: 3</p>
-            <p className="text-xs text-amber-500/60">Next Review: 71 Hours 42 Minutes</p>
           </div>
         </div>
       </section>
 
-      {/* Dynamic Scarcity Section */}
-      <section className="py-16 sm:py-20 px-4 bg-gradient-to-b from-black to-gray-950">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
-            {/* Positions Claimed */}
-            <div className="text-center">
-              <div className="text-5xl sm:text-6xl font-extralight text-amber-500 mb-2">3/7</div>
-              <p className="text-sm text-gray-400 uppercase tracking-wider font-mono">Positions Claimed</p>
-              <p className="text-xs text-gray-500 mt-1">January Cohort</p>
+      {/* Why This Business Wins 2025-2028 */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-wider text-gray-600 mb-3">The Perfect Storm</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+              Why Now Is The Perfect Time
+            </h2>
+          </div>
+          
+          <div className="space-y-8 text-lg leading-relaxed">
+            <div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">AI Can't Replace Physical Work</h3>
+              <p className="text-gray-600">
+                Tech workers are losing jobs to ChatGPT. But AI can't paint walls, install flooring, or fix a leaking roof. 
+                Physical renovation work is forever human.
+              </p>
             </div>
             
-            {/* Next Review */}
-            <div className="text-center">
-              <div className="text-5xl sm:text-6xl font-extralight text-white mb-2">71:42</div>
-              <p className="text-sm text-gray-400 uppercase tracking-wider font-mono">Until Next Review</p>
-              <p className="text-xs text-gray-500 mt-1">Hours : Minutes</p>
+            <div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">Essential Services = Recession-Proof Revenue</h3>
+              <p className="text-gray-600">
+                When pipes burst or roofs leak, people have no choice but to fix them. 
+                Unlike luxury purchases, property maintenance is mandatory. The demand never stops.
+              </p>
             </div>
             
-            {/* Applications From */}
-            <div className="text-center">
-              <div className="text-5xl sm:text-6xl font-extralight text-amber-500 mb-2">24</div>
-              <p className="text-sm text-gray-400 uppercase tracking-wider font-mono">Countries</p>
-              <p className="text-xs text-gray-500 mt-1">Global Reach</p>
+            <div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">Build an Asset, Not a Job</h3>
+              <p className="text-gray-600">
+                No boss. No layoffs. No corporate politics. You're building a business that pays you forever, 
+                not a job that can disappear tomorrow.
+              </p>
             </div>
           </div>
           
-          {/* World Map Placeholder */}
-          <div className="mt-12 relative h-64 bg-gradient-to-b from-gray-900/20 to-gray-900/5 rounded-2xl overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <p className="text-gray-600 text-sm font-mono tracking-wider opacity-50">[ OPERATOR LOCATIONS CLASSIFIED ]</p>
-            </div>
-            {/* Dots representing operators */}
-            <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
-            <div className="absolute top-1/3 right-1/3 w-2 h-2 bg-amber-500 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
-            <div className="absolute bottom-1/3 left-1/2 w-2 h-2 bg-amber-500 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-            <div className="absolute top-1/2 right-1/4 w-2 h-2 bg-amber-500 rounded-full animate-pulse" style={{animationDelay: '1.5s'}}></div>
-            <div className="absolute bottom-1/4 left-1/3 w-2 h-2 bg-amber-500 rounded-full animate-pulse" style={{animationDelay: '2s'}}></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Divider */}
-      <div className="flex items-center justify-center py-8">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent w-full max-w-xs"></div>
-        <div className="mx-4 text-gray-600">◆</div>
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent w-full max-w-xs"></div>
-      </div>
-
-      {/* The Protocol Section */}
-      <section className="py-24 sm:py-32 md:py-40 px-4 bg-gradient-to-b from-gray-950 via-black to-gray-950">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16 sm:mb-20">
-            <p className="text-amber-500/50 text-xs uppercase tracking-[0.4em] mb-8 font-mono animate-fadeIn">PROVEN METHODOLOGY</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extralight mb-8 tracking-tight">
-              The APEX Protocol
-            </h2>
-            <p className="text-gray-300/80 max-w-2xl mx-auto text-lg sm:text-xl font-extralight leading-relaxed">
-              The complete methodology for building your location-independent empire.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-px bg-gray-800/30 rounded-2xl overflow-hidden">
-            <div className="bg-black p-10 sm:p-12 text-center group hover:bg-gray-950/50 transition-all duration-500">
-              <p className="text-xs text-amber-500/40 uppercase tracking-[0.3em] mb-8 font-mono group-hover:text-amber-500/60 transition-colors">PHASE 1 • WEEK 1-4</p>
-              <div className="w-20 h-20 mx-auto mb-8 relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
-                <div className="relative w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-full flex items-center justify-center border border-gray-700 group-hover:border-amber-500/30 transition-all">
-                  <span className="text-2xl">I</span>
-                </div>
-              </div>
-              <h4 className="font-serif text-2xl font-extralight mb-4 tracking-wide">Foundation</h4>
-              <p className="text-gray-500 text-sm leading-relaxed">Market research. Service architecture.<br />First $10K month.</p>
-            </div>
-            
-            <div className="bg-black p-10 sm:p-12 text-center group hover:bg-gray-950/50 transition-all duration-500">
-              <p className="text-xs text-amber-500/40 uppercase tracking-[0.3em] mb-8 font-mono group-hover:text-amber-500/60 transition-colors">PHASE 2 • WEEK 5-8</p>
-              <div className="w-20 h-20 mx-auto mb-8 relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
-                <div className="relative w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-full flex items-center justify-center border border-gray-700 group-hover:border-amber-500/30 transition-all">
-                  <span className="text-2xl">II</span>
-                </div>
-              </div>
-              <h4 className="font-serif text-2xl font-extralight mb-4 tracking-wide">Systems</h4>
-              <p className="text-gray-500 text-sm leading-relaxed">Process automation. Team structure.<br />Scale to $50K months.</p>
-            </div>
-            
-            <div className="bg-black p-10 sm:p-12 text-center group hover:bg-gray-950/50 transition-all duration-500">
-              <p className="text-xs text-amber-500/40 uppercase tracking-[0.3em] mb-8 font-mono group-hover:text-amber-500/60 transition-colors">PHASE 3 • WEEK 9-12</p>
-              <div className="w-20 h-20 mx-auto mb-8 relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
-                <div className="relative w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 rounded-full flex items-center justify-center border border-gray-700 group-hover:border-amber-500/30 transition-all">
-                  <span className="text-2xl">III</span>
-                </div>
-              </div>
-              <h4 className="font-serif text-2xl font-extralight mb-4 tracking-wide">Empire</h4>
-              <p className="text-gray-500 text-sm leading-relaxed">Geographic expansion. Exit preparation.<br />7-figure trajectory.</p>
-            </div>
-          </div>
-
-          <div className="mt-12 text-center">
-            <p className="text-amber-500/40 text-xs font-mono tracking-[0.3em]">
-              MARCEL'S EXACT BLUEPRINT • $0 TO $3M IN 18 MONTHS
+          <div className="mt-12 p-6 bg-white rounded-lg border border-gray-200">
+            <p className="text-lg text-gray-700 text-center">
+              <span className="font-bold text-gray-900">Reality check:</span> Tech laid off 260,000 people in 2024. 
+              Meanwhile, our 3 operators averaged $42K/month. 
+              <span className="block mt-2 font-semibold text-gray-900">Which side would you rather be on?</span>
             </p>
           </div>
         </div>
       </section>
 
-      {/* Divider */}
-      <div className="flex items-center justify-center py-8">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent w-full max-w-xs"></div>
-        <div className="mx-4 text-gray-600">◆</div>
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent w-full max-w-xs"></div>
-      </div>
-
-      {/* The Selection Process Section */}
-      <section className="py-20 sm:py-28 px-4 bg-gradient-to-b from-black to-gray-950">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12 sm:mb-16">
-            <p className="text-amber-500/70 text-xs uppercase tracking-[0.3em] mb-6 font-mono">CONFIDENTIAL</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extralight mb-6 tracking-tight">
-              The Selection Process
-            </h2>
-            <p className="text-gray-400/80 max-w-2xl mx-auto text-lg sm:text-xl font-extralight leading-relaxed">
-              Every 72 hours, we review applications. Only those who meet our criteria advance.
+      {/* Who Is This For */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold mb-6 text-gray-900">Who Is This For?</h2>
+            <p className="text-lg text-gray-600">
+              I'll share everything. Every system. Every secret. Nothing held back.
             </p>
-          </div>
-
-          <div className="grid gap-8 max-w-3xl mx-auto">
-            <div className="flex gap-6 items-start">
-              <span className="text-amber-500/60 font-mono text-sm mt-1">01</span>
-              <div>
-                <h3 className="font-medium text-lg mb-2">Initial Application</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">Submit your background, vision, and commitment level. We assess your readiness for transformation.</p>
-              </div>
-            </div>
-            
-            <div className="flex gap-6 items-start">
-              <span className="text-amber-500/60 font-mono text-sm mt-1">02</span>
-              <div>
-                <h3 className="font-medium text-lg mb-2">Strategic Assessment</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">If selected, you'll undergo a comprehensive evaluation of your business acumen and growth potential.</p>
-              </div>
-            </div>
-            
-            <div className="flex gap-6 items-start">
-              <span className="text-amber-500/60 font-mono text-sm mt-1">03</span>
-              <div>
-                <h3 className="font-medium text-lg mb-2">NDA & Investment Discussion</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">Approved candidates sign confidentiality agreements and discuss the investment required for their transformation.</p>
-              </div>
-            </div>
-            
-            <div className="flex gap-6 items-start">
-              <span className="text-amber-500/60 font-mono text-sm mt-1">04</span>
-              <div>
-                <h3 className="font-medium text-lg mb-2">Acceptance & Onboarding</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">The chosen few begin their 12-week intensive journey. No refunds. Total commitment required.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 text-center space-y-3">
-            <p className="text-amber-500/70 text-sm font-mono tracking-wide">
-              PROTECTED BY NDA • NO REFUNDS • RESULTS NOT TYPICAL
+            <p className="text-lg font-semibold text-gray-900 mt-2">
+              But only with the right people.
             </p>
-            <p className="text-gray-600 text-xs font-mono">
-              FIVE-FIGURE INVESTMENT • PAYMENT PLANS AVAILABLE
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Divider */}
-      <div className="flex items-center justify-center py-8">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent w-full max-w-xs"></div>
-        <div className="mx-4 text-gray-600">◆</div>
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent w-full max-w-xs"></div>
-      </div>
-
-      {/* What is the idea Section */}
-      <section className="py-24 sm:py-32 md:py-40 px-4 bg-black">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-extralight mb-10 sm:mb-14">
-            The Philosophy
-          </h2>
-          <p className="text-gray-400/90 text-base sm:text-lg font-light leading-relaxed mb-12 sm:mb-16">
-            Build, buy, and operate multiple businesses from a distance. Liberate 
-            yourself from the shackles of wage slavery, focusing instead on high-value 
-            tasks rather than the mundane busywork of day-to-day operations.
-          </p>
-          
-          <div className="grid md:grid-cols-3 gap-px bg-gray-800/20 rounded-2xl overflow-hidden max-w-4xl mx-auto">
-            <div className="bg-black p-8 text-center group">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full border border-red-900/50 flex items-center justify-center">
-                <span className="text-red-500/60 text-2xl font-extralight">—</span>
-              </div>
-              <p className="text-lg font-extralight text-gray-400">NOT Freelancing</p>
-              <p className="text-xs text-gray-600 mt-2">No clients. No hourly rates.</p>
-            </div>
-            <div className="bg-black p-8 text-center group">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full border border-orange-900/50 flex items-center justify-center">
-                <span className="text-orange-500/60 text-2xl font-extralight">—</span>
-              </div>
-              <p className="text-lg font-extralight text-gray-400">NOT Remote Jobs</p>
-              <p className="text-xs text-gray-600 mt-2">No bosses. No schedules.</p>
-            </div>
-            <div className="bg-black p-8 text-center group">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full border border-amber-900/50 flex items-center justify-center bg-gradient-to-br from-amber-500/10 to-amber-600/5">
-                <span className="text-amber-500 text-2xl">✓</span>
-              </div>
-              <p className="text-lg font-medium">Empire Building</p>
-              <p className="text-xs text-amber-500/60 mt-2">Own systems. Scale infinitely.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Who This Is For Section */}
-      <section className="py-20 sm:py-28 px-4 bg-black">
-        <div className="max-w-6xl mx-auto">
-          {/* EVERYTHING Quote */}
-          <div className="text-center mb-16 sm:mb-20">
-            <p className="text-amber-500/50 text-xs uppercase tracking-[0.4em] mb-8 font-mono">THE COVENANT</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extralight mb-8 leading-tight">
-              I'll share everything. Every system. Every secret.<br className="hidden sm:block" />
-              Nothing held back.
-            </h2>
-            <p className="text-xl sm:text-2xl text-gray-400 font-extralight">But only with the right people.</p>
-          </div>
-
-          {/* Three Main Personas */}
-          <div className="grid lg:grid-cols-3 gap-8 mb-16">
-            <div className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent rounded-2xl blur-xl group-hover:from-amber-500/10 transition-all duration-500"></div>
-              <div className="relative bg-gradient-to-b from-gray-900/50 to-gray-900/30 border border-gray-800 rounded-2xl p-10 h-full hover:border-amber-500/20 transition-all duration-300">
-                <div className="w-20 h-20 mx-auto mb-8 relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-full blur-lg"></div>
-                  <div className="relative w-full h-full bg-black rounded-full flex items-center justify-center border border-gray-700">
-                    <span className="text-3xl">I</span>
-                  </div>
-                </div>
-                <h3 className="font-serif text-2xl font-extralight mb-6 text-center">Established Contractors</h3>
-                <p className="text-gray-400 text-sm leading-relaxed mb-6 text-center">
-                  Successful locally. Trapped geographically. Ready for true freedom.
-                </p>
-                <div className="border-t border-gray-800 pt-6">
-                  <p className="text-xs text-gray-500 font-mono uppercase text-center">
-                    NOW: $500K+ LOCAL<br />
-                    <span className="text-amber-500/60">NEXT: $1M+ ANYWHERE</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent rounded-2xl blur-xl group-hover:from-amber-500/10 transition-all duration-500"></div>
-              <div className="relative bg-gradient-to-b from-gray-900/50 to-gray-900/30 border border-gray-800 rounded-2xl p-10 h-full hover:border-amber-500/20 transition-all duration-300">
-                <div className="w-20 h-20 mx-auto mb-8 relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-full blur-lg"></div>
-                  <div className="relative w-full h-full bg-black rounded-full flex items-center justify-center border border-gray-700">
-                    <span className="text-3xl">II</span>
-                  </div>
-                </div>
-                <h3 className="font-serif text-2xl font-extralight mb-6 text-center">Remote Entrepreneurs</h3>
-                <p className="text-gray-400 text-sm leading-relaxed mb-6 text-center">
-                  High performers. No more time-for-money trades. Ready to scale.
-                </p>
-                <div className="border-t border-gray-800 pt-6">
-                  <p className="text-xs text-gray-500 font-mono uppercase text-center">
-                    NOW: EXPERTISE<br />
-                    <span className="text-amber-500/60">NEXT: $10K/MONTH SYSTEM</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent rounded-2xl blur-xl group-hover:from-amber-500/10 transition-all duration-500"></div>
-              <div className="relative bg-gradient-to-b from-gray-900/50 to-gray-900/30 border border-gray-800 rounded-2xl p-10 h-full hover:border-amber-500/20 transition-all duration-300">
-                <div className="w-20 h-20 mx-auto mb-8 relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-full blur-lg"></div>
-                  <div className="relative w-full h-full bg-black rounded-full flex items-center justify-center border border-gray-700">
-                    <span className="text-3xl">III</span>
-                  </div>
-                </div>
-                <h3 className="font-serif text-2xl font-extralight mb-6 text-center">Exit Strategists</h3>
-                <p className="text-gray-400 text-sm leading-relaxed mb-6 text-center">
-                  Building to sell. Maximum valuation. True empire builders.
-                </p>
-                <div className="border-t border-gray-800 pt-6">
-                  <p className="text-xs text-gray-500 font-mono uppercase text-center">
-                    NOW: OPERATOR<br />
-                    <span className="text-amber-500/60">NEXT: 7-FIGURE EXIT</span>
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center">
-            <p className="text-gray-300 mb-8 text-xl font-extralight">
-              If you see yourself above, we should talk.
-            </p>
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black px-12 py-5 rounded-2xl font-medium tracking-wider transition-all duration-300 hover:shadow-[0_20px_40px_-12px_rgba(251,191,36,0.3)] hover:scale-[1.02] uppercase"
-              asChild
-            >
-              <Link href="/auth/sign-up">
-                Request Your Invitation
-              </Link>
-            </Button>
-            <p className="text-xs text-gray-600 mt-6 font-mono tracking-[0.2em]">LIMITED TO 7 OPERATORS ANNUALLY</p>
-          </div>
-        </div>
-      </section>
-
-
-      {/* You're in the right place if Section */}
-      <section className="py-20 sm:py-28 px-4 bg-black">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extralight">
-              You belong here if...
-            </h2>
           </div>
           
           <div className="space-y-8">
-            <div className="flex gap-8 items-start group">
-              <div className="flex-shrink-0 w-px h-16 bg-gradient-to-b from-amber-500/20 to-transparent"></div>
-              <p className="text-gray-300 text-xl font-extralight leading-relaxed group-hover:text-white transition-colors">
-                You seek mastery in remote operations at the highest level
+            {/* Established Contractors */}
+            <div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">1. Established Contractors</h3>
+              <p className="text-gray-600 mb-3">
+                Successful locally. Trapped geographically. Ready for true freedom.
+              </p>
+              <p className="text-sm text-gray-500">
+                NOW: $500K+ local → NEXT: $1M+ anywhere
               </p>
             </div>
             
-            <div className="flex gap-8 items-start group">
-              <div className="flex-shrink-0 w-px h-16 bg-gradient-to-b from-amber-500/30 to-transparent"></div>
-              <p className="text-gray-300 text-xl font-extralight leading-relaxed group-hover:text-white transition-colors">
-                You're building an empire, not just another business
+            {/* Remote Entrepreneurs */}
+            <div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">2. Remote Entrepreneurs</h3>
+              <p className="text-gray-600 mb-3">
+                High performers. No more time-for-money trades. Ready to scale.
+              </p>
+              <p className="text-sm text-gray-500">
+                NOW: Expertise → NEXT: $10K/month system
               </p>
             </div>
             
-            <div className="flex gap-8 items-start group">
-              <div className="flex-shrink-0 w-px h-16 bg-gradient-to-b from-amber-500/40 to-transparent"></div>
-              <p className="text-gray-300 text-xl font-extralight leading-relaxed group-hover:text-white transition-colors">
-                You understand that true wealth comes from systems, not sweat
+            {/* Exit Strategists */}
+            <div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-900">3. Exit Strategists</h3>
+              <p className="text-gray-600 mb-3">
+                Building to sell. Maximum valuation. True empire builders.
               </p>
-            </div>
-            
-            <div className="flex gap-8 items-start group">
-              <div className="flex-shrink-0 w-px h-16 bg-gradient-to-b from-amber-500/50 to-transparent"></div>
-              <p className="text-gray-300 text-xl font-extralight leading-relaxed group-hover:text-white transition-colors">
-                You demand complete sovereignty over your time and location
+              <p className="text-sm text-gray-500">
+                NOW: Operator → NEXT: 7-figure exit
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* But How Do You Actually Scale to 7 Figures? - Transition Section */}
-      <section className="py-12 sm:py-16 px-4 bg-black">
+      {/* The Problem */}
+      <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-4xl mx-auto">
-          <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-light mb-6">
-            But How Do You Actually Scale to 7 Figures?
+          <h2 className="text-3xl font-bold mb-8 text-center">
+            The $30K/Month Ceiling That Traps Every Contractor
           </h2>
-          <div className="space-y-6 text-lg text-gray-300/90 font-light leading-relaxed">
+          
+          <div className="space-y-6 text-lg text-gray-700">
             <p>
-              You don't get there by working harder or putting in more hours. That's a losing game. The top 1% of operators, the ones who build empires while traveling the world, think differently. 
+              You've built a solid local business. You're making decent money. But you're still trading hours for dollars, 
+              tied to job sites, managing crews in person, and watching your margins shrink as you scale.
             </p>
-            <p>
-              They build with <span className="text-white font-medium">leverage</span>. They build with <span className="text-white font-medium">systems</span>. They focus on creating asymmetric opportunities where the upside is massive and the downside is capped.
+            
+            <p className="font-semibold">
+              Meanwhile, a new breed of "Remote Operators" are quietly revolutionizing the game:
             </p>
-            <p className="font-medium text-white">
-              Here’s how it works:
-            </p>
-            <ul className="list-disc list-inside space-y-3 pl-2">
-              <li>
-                <span className="font-medium text-white">We build Systems for Growth:</span> Create repeatable processes for sales, operations, and fulfillment that run without your daily involvement.
-              </li>
-              <li>
-                <span className="font-medium text-white">We use Leverage to Scale:</span> Implement technology and talent to multiply your output, so you can manage multiple markets at once.
-              </li>
-              <li>
-                <span className="font-medium text-white">We Engineer for Exit:</span> Structure your business from day one to be a sellable asset, not just a job.
-              </li>
-            </ul>
-            <p>
-              This is the blueprint for building a location-independent contracting empire. This is the APEX Protocol.
+            
+            <div className="grid md:grid-cols-2 gap-6 my-8">
+              <div className="bg-white p-6 rounded-lg border border-gray-200">
+                <h4 className="font-bold mb-3">Traditional Contractor</h4>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-500 mt-1">✗</span>
+                    <span>Stuck in one location</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-500 mt-1">✗</span>
+                    <span>Trading time for money</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-500 mt-1">✗</span>
+                    <span>Managing crews in person</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-500 mt-1">✗</span>
+                    <span>Income tied to hours worked</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-gradient-to-br from-blue-50 to-white p-6 rounded-lg border-2 border-blue-200">
+                <h4 className="font-bold mb-3">Remote Operator (You)</h4>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-1">✓</span>
+                    <span>Operate from anywhere</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-1">✓</span>
+                    <span>Systems run the business</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-1">✓</span>
+                    <span>Virtual crew management</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-500 mt-1">✓</span>
+                    <span>Income scales without you</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            
+            <p className="text-xl font-semibold text-center">
+              The difference? They have the systems. And now, so can you.
             </p>
           </div>
         </div>
       </section>
 
-
-
-      {/* Why I'm Doing This Section */}
-      <section className="py-20 sm:py-28 px-4 bg-black">
+      {/* Video Section */}
+      <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-amber-500/50 text-xs uppercase tracking-[0.4em] mb-8 font-mono">THE FOUNDER</p>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extralight mb-10">
-            Why I'm Doing This
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            See How The Remote Operator Model Works
           </h2>
+          <p className="text-xl text-gray-700 mb-8">
+            Watch this 12-minute case study to see how contractors are building 
+            profitable remote service businesses
+          </p>
           
-          <div className="mb-10">
-            <div className="relative inline-block">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent rounded-2xl blur-3xl"></div>
-              <Image
-                src="/heromyles.jpg"
-                alt="Myles Webb"
-                width={800}
-                height={400}
-                className="relative rounded-2xl mx-auto max-w-full h-auto shadow-2xl"
-              />
-            </div>
-          </div>
-          
-          <div className="space-y-6 text-gray-400/90 text-base sm:text-lg font-light leading-relaxed text-left max-w-3xl mx-auto">
-            <p>
-              This is a specialized knowledge base designed to meet all the needs I had years ago. For the longest time I 
-              wanted to travel and produce an income at the same time.
-            </p>
-            
-            <p>
-              We're experiencing an era where remote business is entirely feasible, whereas just one generation ago, this 
-              wasn't the case. It's almost as if the world has been unlocked just for you to experience and enjoy.
-            </p>
-            
-            <p>
-              Although I may not have the resources for ongoing training, my goal remains to equip you with the essential 
-              knowledge needed to embrace a location-independent lifestyle.
-            </p>
-          </div>
-
-          <div className="mt-10 grid md:grid-cols-3 gap-8 max-w-2xl mx-auto">
-            <div className="text-center">
-              <p className="text-3xl font-extralight text-amber-500 mb-2">2</p>
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Successful Exits</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl font-extralight text-amber-500 mb-2">$3M+</p>
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Generated</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl font-extralight text-amber-500 mb-2">24</p>
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Countries</p>
-            </div>
+          {/* Video Embed */}
+          <div className="relative aspect-video bg-gray-900 rounded-lg shadow-2xl overflow-hidden">
+            <iframe
+              src="https://www.loom.com/embed/c954a298a53c45dfb558460b77a79552"
+              className="absolute inset-0 w-full h-full"
+              style={{ border: '0' }}
+              allowFullScreen
+            />
           </div>
           
-          <div className="mt-10">
-            <a 
-              href="https://myleskameron.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-amber-500/60 hover:text-amber-500 transition-all duration-300 group"
-            >
-              <span className="text-sm font-mono tracking-wider">VERIFY TRACK RECORD</span>
-              <span className="text-lg group-hover:translate-x-1 transition-transform">→</span>
-            </a>
-          </div>
+          <p className="text-sm text-gray-600 mt-6">
+            <strong>1,284+ contractors</strong> have watched this video
+          </p>
         </div>
       </section>
 
-      {/* What is Wealth Section */}
-      <section className="py-20 sm:py-28 px-4 bg-gradient-to-b from-gray-950 to-black">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="font-serif text-4xl sm:text-5xl font-extralight mb-6">
-            What is Wealth?
-          </h2>
-          <p className="text-gray-400 text-lg sm:text-xl font-light mb-6 max-w-2xl mx-auto">
-            Most chase one. Few achieve all three.
-          </p>
-          <p className="text-gray-300 text-xl sm:text-2xl font-extralight mb-16 max-w-3xl mx-auto leading-relaxed animate-fadeIn" style={{animationDelay: '0.5s'}}>
-            Money without time is poverty. Time without freedom is prison.<br />
-            Only all three create a life worth living.
-          </p>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="group">
-              <div className="bg-gradient-to-b from-gray-900/50 to-gray-900/20 border border-gray-800 rounded-xl p-10 h-full transition-all duration-300 hover:border-amber-500/30">
-                <div className="mb-6">
-                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-full flex items-center justify-center">
-                    <span className="text-2xl">₿</span>
-                  </div>
-                </div>
-                <h3 className="font-serif text-xl font-light mb-4 text-amber-500">Capital Freedom</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  Beyond income. Build systems that generate wealth while you sleep.
-                </p>
-              </div>
-            </div>
-            
-            <div className="group">
-              <div className="bg-gradient-to-b from-gray-900/50 to-gray-900/20 border border-gray-800 rounded-xl p-10 h-full transition-all duration-300 hover:border-amber-500/30">
-                <div className="mb-6">
-                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-full flex items-center justify-center">
-                    <span className="text-2xl">∞</span>
-                  </div>
-                </div>
-                <h3 className="font-serif text-xl font-light mb-4 text-amber-500">Time Sovereignty</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  Own your calendar. Let systems and teams execute your vision.
-                </p>
-              </div>
-            </div>
-            
-            <div className="group">
-              <div className="bg-gradient-to-b from-gray-900/50 to-gray-900/20 border border-gray-800 rounded-xl p-10 h-full transition-all duration-300 hover:border-amber-500/30">
-                <div className="mb-6">
-                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-full flex items-center justify-center">
-                    <span className="text-2xl">🗺</span>
-                  </div>
-                </div>
-                <h3 className="font-serif text-xl font-light mb-4 text-amber-500">Location Independence</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  Run your empire from Bali, Dubai, or your hometown. True freedom.
-                </p>
-              </div>
-            </div>
+      {/* Success Stories */}
+      <section className="py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-wider text-gray-600 mb-4">The Proof</p>
+            <h2 className="text-3xl md:text-4xl font-bold">
+              Real Operators. Real Results. Real Fast.
+            </h2>
           </div>
 
-          <div className="mt-16">
-            <p className="text-gray-500 text-sm font-mono mb-8">
-              APEX OPERATORS ACHIEVE ALL THREE
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {/* Marcel */}
+            <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-200">
+              <div className="flex items-center gap-4 mb-4">
+                <Image
+                  src="/marcel-avatar.jpg"
+                  alt="Marcel C."
+                  width={60}
+                  height={60}
+                  className="rounded-full"
+                />
+                <div>
+                  <h4 className="font-bold">Marcel C.</h4>
+                  <p className="text-sm text-gray-600">Phoenix, AZ</p>
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-green-600 mb-2">$67K/month</p>
+              <p className="text-gray-700 mb-4">
+                "Started 8 months ago while still working full-time. Now running 3 crews 
+                and just quit my job last month."
+              </p>
+              <p className="text-sm text-gray-500">Interior Remodeling</p>
+            </div>
+
+            {/* Sarah */}
+            <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-200">
+              <div className="flex items-center gap-4 mb-4">
+                <Image
+                  src="/sarah-avatar.jpg"
+                  alt="Sarah K."
+                  width={60}
+                  height={60}
+                  className="rounded-full"
+                />
+                <div>
+                  <h4 className="font-bold">Sarah K.</h4>
+                  <p className="text-sm text-gray-600">Dallas, TX</p>
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-green-600 mb-2">$32K/month</p>
+              <p className="text-gray-700 mb-4">
+                "Went from zero to $30K/month in 5 months. The systems and templates 
+                saved me years of trial and error."
+              </p>
+              <p className="text-sm text-gray-500">Painting & Flooring</p>
+            </div>
+
+            {/* Mike */}
+            <div className="bg-white rounded-lg p-6 shadow-lg border border-gray-200">
+              <div className="flex items-center gap-4 mb-4">
+                <Image
+                  src="/mike-avatar.jpg"
+                  alt="Mike R."
+                  width={60}
+                  height={60}
+                  className="rounded-full"
+                />
+                <div>
+                  <h4 className="font-bold">Mike R.</h4>
+                  <p className="text-sm text-gray-600">Atlanta, GA</p>
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-green-600 mb-2">$28K/month</p>
+              <p className="text-gray-700 mb-4">
+                "Started with one concrete crew. Now handling patios, driveways, and turf 
+                installs. The systems made scaling easy."
+              </p>
+              <p className="text-sm text-gray-500">Exterior Renovation</p>
+            </div>
+          </div>
+          
+          <p className="text-center text-sm text-gray-600 mt-8">
+            Average operator reaches $10K/month by day 90
+          </p>
+        </div>
+      </section>
+
+      {/* What You Get */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold mb-8 text-gray-900">What You Get</h2>
+          
+          <div className="space-y-6 text-lg text-gray-600 mb-12">
+            <p>
+              <strong className="text-gray-900">The complete APEX system</strong> for building and managing a remote renovation business. 
+              Everything you need to go from zero to $30K+/month.
+            </p>
+            
+            <ul className="space-y-3">
+              <li>• 50+ SOPs, contracts, and templates (copy/paste ready)</li>
+              <li>• Proven hiring scripts and training videos for crews</li>
+              <li>• Marketing campaigns that actually generate leads</li>
+              <li>• Pricing calculators and profit margin tools</li>
+              <li>• WhatsApp group with 3 active operators</li>
+              <li>• Weekly implementation calls</li>
+              <li>• Vendor lists and supplier relationships</li>
+            </ul>
+          </div>
+          
+          <div className="border-t border-gray-200 pt-8">
+            <p className="text-2xl font-bold text-gray-900 mb-2">Investment: $6,997</p>
+            <p className="text-gray-600 mb-8">
+              Or 3 payments of $2,497. Includes 12 months access.
             </p>
             <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black px-10 py-4 text-base font-medium rounded-2xl transition-all duration-300 hover:shadow-[0_20px_40px_-12px_rgba(251,191,36,0.3)] hover:scale-[1.02] uppercase tracking-wider"
-              asChild
+              onClick={handleApply}
+              className="bg-gray-900 hover:bg-black text-white px-8 py-6 text-base font-medium rounded-md transition-colors"
             >
-              <Link href="/apply">
-                Request Invitation
-              </Link>
+              Apply Now →
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Divider */}
-      <div className="flex items-center justify-center py-8">
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent w-full max-w-xs"></div>
-        <div className="mx-4 text-gray-600">◆</div>
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent w-full max-w-xs"></div>
-      </div>
 
-      {/* Essential Information Section */}
-      <section className="py-24 sm:py-32 md:py-40 px-4 bg-black">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-amber-500/50 text-xs uppercase tracking-[0.4em] mb-8 font-mono">FREQUENTLY ASKED</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extralight">
-              Essential Information
-            </h2>
+      {/* What's Included - Detailed */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold mb-12 text-center">
+            Everything You Get With Your License
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-12">
+            <div>
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <Building2 className="w-6 h-6 text-blue-600" />
+                Complete Business Systems
+              </h3>
+              <ul className="space-y-3 text-gray-700">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>30-Day Launch Roadmap (day-by-day plan)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Service Setup Templates (HVAC, Plumbing, Electrical, More)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Pricing Calculators & Profit Margin Tools</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Legal Contracts & Service Agreements</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Insurance & Bonding Guidelines</span>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <Users className="w-6 h-6 text-blue-600" />
+                Crew Management Systems
+              </h3>
+              <ul className="space-y-3 text-gray-700">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Remote Hiring Scripts & Interview Process</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Training Videos & Onboarding Systems</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Daily Accountability Tracking Sheets</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Quality Control Photo Checklists</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Performance Bonus Structures</span>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <TrendingUp className="w-6 h-6 text-blue-600" />
+                Growth & Marketing
+              </h3>
+              <ul className="space-y-3 text-gray-700">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Google Ads Templates (Proven Winners)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Facebook Lead Generation Campaigns</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>5-Star Review Generation System</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Referral Program Templates</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Local SEO Domination Guide</span>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <Award className="w-6 h-6 text-blue-600" />
+                Exclusive Benefits
+              </h3>
+              <ul className="space-y-3 text-gray-700">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Territory Protection (No competition)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>WhatsApp Operator Mastermind</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Verified Vendor Network Access</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Quarterly Virtual Meetups</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>License Transfer Rights</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Territory Map */}
+      <section className="py-16 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Territory Availability</h2>
+            <p className="text-gray-600">Each license includes exclusive rights to your chosen territory</p>
           </div>
 
-          <div className="space-y-px bg-gray-800/20 rounded-2xl overflow-hidden">
+          <div className="bg-gray-100 rounded-lg p-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="bg-red-100 text-red-800 p-3 rounded text-center font-medium">Phoenix - TAKEN</div>
+              <div className="bg-red-100 text-red-800 p-3 rounded text-center font-medium">Dallas - TAKEN</div>
+              <div className="bg-red-100 text-red-800 p-3 rounded text-center font-medium">Miami - TAKEN</div>
+              <div className="bg-green-100 text-green-800 p-3 rounded text-center font-medium">Houston - AVAILABLE</div>
+              <div className="bg-red-100 text-red-800 p-3 rounded text-center font-medium">Denver - TAKEN</div>
+              <div className="bg-green-100 text-green-800 p-3 rounded text-center font-medium">Austin - AVAILABLE</div>
+              <div className="bg-red-100 text-red-800 p-3 rounded text-center font-medium">Las Vegas - TAKEN</div>
+              <div className="bg-green-100 text-green-800 p-3 rounded text-center font-medium">Atlanta - AVAILABLE</div>
+              <div className="bg-red-100 text-red-800 p-3 rounded text-center font-medium">Chicago - TAKEN</div>
+              <div className="bg-green-100 text-green-800 p-3 rounded text-center font-medium">Nashville - AVAILABLE</div>
+              <div className="bg-red-100 text-red-800 p-3 rounded text-center font-medium">San Diego - TAKEN</div>
+              <div className="bg-green-100 text-green-800 p-3 rounded text-center font-medium">Tampa - AVAILABLE</div>
+            </div>
+            
+            <p className="text-center text-sm text-gray-600 mt-6">
+              Don't see your city? Apply to check availability. New territories open based on population.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold mb-12 text-center">Common Questions</h2>
+          
+          <div className="space-y-4">
             {[
               {
-                question: "Who is this for?",
-                answer: "Established contractors trapped by geography. Remote entrepreneurs ready to scale. Business builders who want location independence. Those ready to invest in transformation, not just information."
+                q: "What exactly is an Operator License?",
+                a: "It's your exclusive right to use the APEX systems in your territory. You get all templates, SOPs, vendor lists, and ongoing support. Think of it as a business-in-a-box with built-in territory protection."
               },
               {
-                question: "What is the investment?",
-                answer: "This is a high-touch, 12-week intensive program. Investment details are discussed after application approval. We only work with those who see the value in premium transformation."
+                q: "Do I need contracting experience?",
+                a: "No. Marcel had zero experience. The system includes hiring scripts to find experienced crews. You manage the business, they do the work."
               },
               {
-                question: "How selective is the process?",
-                answer: "Extremely. We accept 7 operators annually from thousands of applications. We review applications every 72 hours and only advance those who demonstrate readiness for this level of success."
+                q: "How fast can I realistically hit $10K/month?",
+                a: "87% of operators hit $10K by day 90. The 30-day launch plan gets your first crew operational in week 3-4. Scale depends on your market and execution speed."
               },
               {
-                question: "What results can I expect?",
-                answer: "Marcel went from $0 to $3M in 18 months using this exact system. While results vary, our operators typically reach $10K/month within 90 days and build toward 7-figure exits."
+                q: "What if someone already has my city?",
+                a: "Each major metro is divided by population. If Phoenix is taken, you might get Scottsdale or Tempe. During application, you'll see all available territories."
               },
               {
-                question: "Is this another course?",
-                answer: "No. This is a complete business transformation system with direct mentorship, proven blueprints, and access to our elite operator network. You're buying a new future, not just information."
+                q: "Can I sell my license later?",
+                a: "Yes. Your territory license is a transferable asset. As you build revenue, it becomes more valuable. Several operators have sold for 5-10x monthly revenue."
               },
               {
-                question: "What is the time commitment?",
-                answer: "The 12-week intensive requires 10-15 hours per week minimum. This is for serious operators only. If you're looking for passive income or get-rich-quick schemes, this isn't for you."
+                q: "What's included in the WhatsApp group?",
+                a: "Real-time support from 47 successful operators. Share wins, get vendor recommendations, troubleshoot challenges. Not for basic questions - for strategic collaboration."
               },
               {
-                question: "Are there refunds?",
-                answer: "No refunds. We only accept those fully committed to transformation. Our vetting process ensures mutual fit. Once you're in, you're expected to execute."
-              },
-              {
-                question: "What happens after 12 weeks?",
-                answer: "You become part of the APEX Network permanently. Lifetime access to our systems, annual summits, deal flow, and the brotherhood of elite operators building empires worldwide."
+                q: "Why $6,997?",
+                a: "You're not buying information (that's free online). You're buying proven systems, territory rights, and access to a network doing $2.3M/month combined. Most operators make this back in month 1-2."
               }
-            ].map((faq, index) => (
-              <div key={index} className="bg-black border-b border-gray-800/50 last:border-b-0">
-                <details className="group">
-                  <summary className="flex items-center justify-between p-8 cursor-pointer hover:bg-gray-950/50 transition-all">
-                    <span className="text-lg font-extralight tracking-wide pr-4">{faq.question}</span>
-                    <span className="flex-shrink-0 text-2xl font-thin text-gray-600 group-open:hidden">+</span>
-                    <span className="flex-shrink-0 text-2xl font-thin text-gray-600 hidden group-open:block">−</span>
-                  </summary>
-                  <div className="px-8 pb-8">
-                    <p className="text-gray-400 leading-relaxed">{faq.answer}</p>
-                  </div>
-                </details>
-              </div>
+            ].map((faq, i) => (
+              <details key={i} className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+                <summary className="p-4 cursor-pointer font-medium hover:bg-gray-50">
+                  {faq.q}
+                </summary>
+                <div className="p-4 pt-0 text-gray-600">
+                  {faq.a}
+                </div>
+              </details>
             ))}
           </div>
         </div>
       </section>
 
-      {/* The Network Section */}
-      <section className="py-20 sm:py-28 px-4 bg-gradient-to-b from-black to-gray-950">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <p className="text-amber-500/50 text-xs uppercase tracking-[0.4em] mb-8 font-mono">BY INVITATION ONLY</p>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extralight mb-8 tracking-tight">
-              The APEX Network
-            </h2>
-            <p className="text-gray-300/80 max-w-2xl mx-auto text-lg sm:text-xl font-extralight leading-relaxed">
-              A brotherhood of empire builders. Operating worldwide. Building forever.
-            </p>
-          </div>
-
-          {/* Network Stats */}
-          <div className="grid md:grid-cols-4 gap-px bg-gray-800/20 rounded-2xl overflow-hidden mb-16">
-            <div className="bg-black p-8 text-center">
-              <div className="text-4xl font-extralight text-amber-500 mb-2">7</div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider font-mono">Operators/Year</p>
-            </div>
-            <div className="bg-black p-8 text-center">
-              <div className="text-4xl font-extralight text-white mb-2">$3M+</div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider font-mono">Avg Revenue</p>
-            </div>
-            <div className="bg-black p-8 text-center">
-              <div className="text-4xl font-extralight text-amber-500 mb-2">∞</div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider font-mono">Lifetime Access</p>
-            </div>
-            <div className="bg-black p-8 text-center">
-              <div className="text-4xl font-extralight text-white mb-2">100%</div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider font-mono">Location Free</p>
-            </div>
-          </div>
-
-          {/* Network Benefits */}
-          <div className="space-y-px bg-gray-800/20 rounded-2xl overflow-hidden">
-            <div className="bg-black p-12 text-center">
-              <h3 className="font-serif text-2xl font-extralight mb-8">Member Privileges</h3>
-              <div className="grid md:grid-cols-3 gap-12">
-                <div>
-                  <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-full flex items-center justify-center border border-gray-800">
-                    <span className="text-2xl">I</span>
-                  </div>
-                  <h4 className="font-medium mb-3 text-amber-500/80">Annual Summit</h4>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    Mykonos 2025<br />
-                    Private villa. 3 days.<br />
-                    Operators only.
-                  </p>
-                </div>
-                <div>
-                  <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-full flex items-center justify-center border border-gray-800">
-                    <span className="text-2xl">II</span>
-                  </div>
-                  <h4 className="font-medium mb-3 text-amber-500/80">Deal Flow</h4>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    First access to acquisitions.<br />
-                    Vetted opportunities.<br />
-                    Operator-to-operator deals.
-                  </p>
-                </div>
-                <div>
-                  <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-full flex items-center justify-center border border-gray-800">
-                    <span className="text-2xl">III</span>
-                  </div>
-                  <h4 className="font-medium mb-3 text-amber-500/80">Brotherhood</h4>
-                  <p className="text-sm text-gray-500 leading-relaxed">
-                    Direct line to all operators.<br />
-                    Monthly mastermind calls.<br />
-                    Forever connected.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 text-center">
-            <p className="text-amber-500/40 text-xs font-mono tracking-[0.3em]">
-              ONCE IN, ALWAYS IN • NO EXCEPTIONS
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* The Only One We've Ever Trusted */}
-      <section className="py-16 sm:py-20 px-4 bg-black">
-        <div className="max-w-4xl mx-auto">
-          {/* Exclusive Header */}
-          <div className="text-center mb-12 sm:mb-16 md:mb-20">
-            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light mb-6 sm:mb-8 leading-tight">
-              In 3 Years, We've Only Shared This System With One Person
-            </h2>
-            <div className="flex items-center justify-center gap-2 sm:gap-4 text-amber-500/70 mb-6 sm:mb-8 md:mb-10">
-              <div className="h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent w-16 sm:w-32"></div>
-              <span className="text-xs uppercase tracking-[0.3em] font-mono">Highly Exclusive</span>
-              <div className="h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent w-16 sm:w-32"></div>
-            </div>
-            <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-3xl mx-auto font-light leading-relaxed">
-              Thousands have asked. We've said no to everyone. Except one.
-            </p>
-          </div>
-
-          {/* Marcel's Story */}
-          <Card className="bg-gradient-to-br from-amber-900/10 to-gray-900 border-amber-600/30 overflow-hidden hover-lift">
-            <CardContent className="p-0">
-              <div className="grid md:grid-cols-2 gap-0">
-                {/* Image Side */}
-                <div className="relative h-64 sm:h-80 md:h-full md:min-h-[400px]">
-                  <Image
-                    src="/campos.jpg"
-                    alt="Marcel Campos"
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-black/80"></div>
-                </div>
-                
-                {/* Content Side */}
-                <div className="p-6 sm:p-8 md:p-12 space-y-4 sm:space-y-6">
-                  <div>
-                    <h3 className="font-serif text-xl sm:text-2xl font-light mb-2 text-amber-500">Marcel Campos</h3>
-                    <p className="text-gray-400 text-sm uppercase tracking-wide">Operator 001 • The Chosen One</p>
-                  </div>
-                  
-                  <div className="space-y-3 sm:space-y-4 text-gray-300 text-sm sm:text-base">
-                    <p className="text-base sm:text-lg font-medium">
-                      An immigrant from Brazil who arrived with nothing but a bag and a dream.
-                    </p>
-                    
-                    <p>
-                      Marcel wasn't looking for handouts. He was a hard worker with bigger dreams than anyone we'd met. 
-                      That's why we chose him.
-                    </p>
-                    
-                    <p>
-                      We gave him access to the APEX System - the same system we'd kept locked away for years. 
-                      The transformation was immediate.
-                    </p>
-                  </div>
-                  
-                  <div className="bg-card border-t-4 border-blueprint-blue-500 rounded-lg p-4 sm:p-6 mt-4 sm:mt-6">
-                    <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-amber-500 mb-2">$3 Million</div>
-                    <p className="text-gray-300 text-sm sm:text-base">Current Status: [$3M Revenue - Verified]</p>
-                    <p className="text-xs sm:text-sm text-gray-400/80 mt-2">From zero to empire in 18 months</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* The Challenge */}
-          <div className="text-center mt-12 sm:mt-16 space-y-4 sm:space-y-6">
-            <p className="text-lg sm:text-xl text-gray-300 font-medium">
-              If Marcel could do it - starting with nothing - what's your excuse?
-            </p>
-            
-            <div className="max-w-2xl mx-auto">
-              <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
-                But here's the thing: We're not looking for everyone. We're looking for the next Marcel. 
-                Someone who won't just use this system, but will honor it. Someone who understands that 
-                with great power comes great responsibility.
-              </p>
-            </div>
-            
-            <p className="text-amber-500 font-semibold text-base sm:text-lg">
-              Are you worthy of this knowledge?
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Other Operators Section */}
-      <section className="py-16 sm:py-20 px-4 bg-gradient-to-b from-black to-gray-950">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-amber-500/50 text-xs uppercase tracking-[0.4em] mb-6 font-mono">VERIFIED RESULTS</p>
-            <h3 className="font-serif text-2xl sm:text-3xl font-extralight mb-4">
-              The Few Who Made It
-            </h3>
-            <p className="text-gray-400 text-sm max-w-2xl mx-auto">
-              Privacy protected. Results verified. Names withheld by request.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Operator 002 */}
-            <div className="bg-gradient-to-b from-gray-900/30 to-gray-900/10 border border-gray-800 rounded-xl p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <p className="text-amber-500/60 text-xs font-mono mb-2">OPERATOR 002</p>
-                  <p className="text-xl font-light">Former Tech Executive</p>
-                  <p className="text-sm text-gray-500 mt-1">Singapore → Global</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-light text-amber-500">$1.8M</p>
-                  <p className="text-xs text-gray-500">14 months</p>
-                </div>
-              </div>
-              <div className="border-t border-gray-800 pt-6">
-                <p className="text-sm text-gray-400 italic">
-                  "Left a $300K corporate job. Now running operations from 5 countries. 
-                  The system works if you work the system."
-                </p>
-              </div>
-            </div>
-
-            {/* Operator 003 */}
-            <div className="bg-gradient-to-b from-gray-900/30 to-gray-900/10 border border-gray-800 rounded-xl p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <p className="text-amber-500/60 text-xs font-mono mb-2">OPERATOR 003</p>
-                  <p className="text-xl font-light">Construction Veteran</p>
-                  <p className="text-sm text-gray-500 mt-1">Texas → Nationwide</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-light text-amber-500">$2.4M</p>
-                  <p className="text-xs text-gray-500">Exit pending</p>
-                </div>
-              </div>
-              <div className="border-t border-gray-800 pt-6">
-                <p className="text-sm text-gray-400 italic">
-                  "20 years swinging hammers. Now I manage 3 markets remotely. 
-                  Building to sell for 7 figures."
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 text-center">
-            <p className="text-xs text-gray-600 font-mono">
-              RESULTS INDEPENDENTLY VERIFIED • TYPICAL RESULTS: $0
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Exclusive Statement */}
-      <section className="py-16 sm:py-20 px-4 bg-black">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="font-serif text-2xl sm:text-3xl md:text-4xl font-extralight leading-relaxed animate-fadeIn">
-            <span className="text-gray-400">Not everyone can.</span><br />
-            <span className="text-gray-300">Not everyone will.</span><br />
-            <span className="text-amber-500/80">Almost no one does.</span>
-          </p>
-        </div>
-      </section>
-
-      {/* What Happens Next Section */}
-      <section className="py-20 sm:py-24 px-4 bg-gradient-to-b from-gray-950 to-black">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-amber-500/50 text-xs uppercase tracking-[0.4em] mb-8 font-mono">THE PROCESS</p>
-            <h2 className="font-serif text-3xl sm:text-4xl font-extralight mb-6">
-              What Happens After You Apply
-            </h2>
-            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Every application is personally reviewed. Here's exactly what to expect.
-            </p>
-          </div>
-
-          <div className="space-y-px bg-gray-800/20 rounded-2xl overflow-hidden">
-            <div className="bg-black p-8 flex gap-6 items-start">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-full flex items-center justify-center border border-gray-800">
-                <span className="text-amber-500/60 font-mono text-sm">24h</span>
-              </div>
-              <div>
-                <h3 className="font-medium mb-2">Application Acknowledged</h3>
-                <p className="text-sm text-gray-400">You'll receive confirmation that your application entered our review queue. No automated responses.</p>
-              </div>
-            </div>
-
-            <div className="bg-black p-8 flex gap-6 items-start">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-full flex items-center justify-center border border-gray-800">
-                <span className="text-amber-500/60 font-mono text-sm">72h</span>
-              </div>
-              <div>
-                <h3 className="font-medium mb-2">Review & Decision</h3>
-                <p className="text-sm text-gray-400">Your application is reviewed during our 72-hour cycle. Most applicants receive a polite decline.</p>
-              </div>
-            </div>
-
-            <div className="bg-black p-8 flex gap-6 items-start">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-full flex items-center justify-center border border-gray-800">
-                <span className="text-amber-500/60 font-mono text-sm">7d</span>
-              </div>
-              <div>
-                <h3 className="font-medium mb-2">Strategic Assessment Call</h3>
-                <p className="text-sm text-gray-400">Selected applicants receive a 45-minute assessment call. We evaluate your readiness and fit.</p>
-              </div>
-            </div>
-
-            <div className="bg-black p-8 flex gap-6 items-start">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-amber-500/20 to-amber-600/10 rounded-full flex items-center justify-center border border-gray-800">
-                <span className="text-amber-500 text-lg">✓</span>
-              </div>
-              <div>
-                <h3 className="font-medium mb-2">Final Acceptance</h3>
-                <p className="text-sm text-gray-400">The chosen few sign NDAs, complete investment, and begin their transformation immediately.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 text-center">
-            <p className="text-gray-500 text-sm">
-              <span className="text-amber-500/60">97%</span> of applicants don't make it past review.<br />
-              <span className="text-xs text-gray-600">This is by design.</span>
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Final CTA */}
-      <section className="py-20 sm:py-28 px-4 bg-black text-center">
-        <div className="max-w-2xl mx-auto space-y-6 sm:space-y-8">
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extralight">
-            Will You Be The Next One?
+      <section className="py-20 px-4 bg-black text-white text-center">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            {availableSpots} Spots Remaining for Q4 2025
           </h2>
-          <p className="text-lg sm:text-xl text-gray-400/80 font-extralight leading-relaxed">
-            We select only those who demonstrate readiness for this level of success.
+          <p className="text-xl text-gray-300 mb-8">
+            Limited enrollment to ensure quality support for all students.
           </p>
-          <div className="pt-4">
+          
+          <div className="bg-gray-900 rounded-lg p-8 mb-8">
+            <p className="text-2xl font-bold text-amber-500 mb-2">
+              APEX Operator License
+            </p>
+            <p className="text-3xl font-bold mb-4">$6,997</p>
+            <p className="text-gray-400 mb-6">or 3 payments of $2,497</p>
+            
             <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-black px-10 py-4 text-base font-medium rounded-2xl transition-all duration-300 hover:shadow-[0_20px_40px_-12px_rgba(251,191,36,0.3)] hover:scale-[1.02] uppercase tracking-wider w-full sm:w-auto"
-              asChild
+              onClick={handleApply}
+              size="lg"
+              className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-black px-12 py-6 text-lg font-bold"
             >
-              <Link href="/apply">
-                Request Invitation
-              </Link>
+              Apply for Your Territory Now →
             </Button>
-            <p className="text-sm text-gray-500 mt-6 font-mono tracking-wide opacity-60">Limited to 7 Operators Annually</p>
+            
+            <p className="text-sm text-gray-500 mt-4">
+              $97 application fee • Instant approval • Start Monday
+            </p>
           </div>
+          
+          <p className="text-sm text-gray-400">
+            Questions? Email support@remoteops.ai<br />
+            Average response time: 2 hours during business hours
+          </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="relative py-16 sm:py-20 px-4 bg-black">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gray-800 to-transparent"></div>
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-12 mb-16">
-            {/* Company */}
-            <div>
-              <h4 className="font-mono text-[10px] uppercase tracking-[0.3em] text-amber-500/40 mb-6">APEX OPERATIONS</h4>
-              <p className="text-xs text-gray-600 leading-loose">
-                Elite operator development<br />
-                Delaware, United States<br />
-                Founded 2021
-              </p>
-            </div>
-            
-            {/* Legal */}
-            <div>
-              <h4 className="font-mono text-[10px] uppercase tracking-[0.3em] text-amber-500/40 mb-6">LEGAL</h4>
-              <div className="space-y-3">
-                <a href="/terms" className="block text-xs text-gray-600 hover:text-gray-400 transition-colors">Terms</a>
-                <a href="/privacy" className="block text-xs text-gray-600 hover:text-gray-400 transition-colors">Privacy</a>
-                <a href="/nda" className="block text-xs text-gray-600 hover:text-gray-400 transition-colors">NDA</a>
-              </div>
-            </div>
-            
-            {/* Contact */}
-            <div>
-              <h4 className="font-mono text-[10px] uppercase tracking-[0.3em] text-amber-500/40 mb-6">CONTACT</h4>
-              <p className="text-xs text-gray-600 leading-loose">
-                By application only<br />
-                <span className="text-amber-500/60">apply@remoteops.ai</span>
-              </p>
-            </div>
-            
-            {/* Security */}
-            <div>
-              <h4 className="font-mono text-[10px] uppercase tracking-[0.3em] text-amber-500/40 mb-6">SECURED BY</h4>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-1 h-1 bg-amber-500/40 rounded-full"></div>
-                  <span className="text-xs text-gray-600">256-bit encryption</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-1 h-1 bg-amber-500/40 rounded-full"></div>
-                  <span className="text-xs text-gray-600">SSL certified</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-1 h-1 bg-amber-500/40 rounded-full"></div>
-                  <span className="text-xs text-gray-600">NDA protected</span>
-                </div>
-              </div>
-            </div>
+      <footer className="py-8 px-4 bg-gray-900 text-center text-sm text-gray-400">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex justify-center gap-6 mb-4">
+            <Link href="/terms" className="hover:text-white">Terms</Link>
+            <Link href="/privacy" className="hover:text-white">Privacy</Link>
+            <Link href="/disclaimer" className="hover:text-white">Earnings Disclaimer</Link>
           </div>
-          
-          <div className="pt-12 border-t border-gray-900/50 text-center space-y-4">
-            <p className="text-[10px] text-gray-700 font-mono tracking-[0.3em]">
-              NO REFUNDS • RESULTS NOT TYPICAL • SERIOUS INQUIRIES ONLY
-            </p>
-            <p className="text-[10px] text-gray-800">
-              © {new Date().getFullYear()} APEX Operations LLC. All rights reserved.
-            </p>
-          </div>
+          <p>© {new Date().getFullYear()} APEX Operations LLC. All rights reserved.</p>
+          <p className="mt-2">Results shown are not typical. Your results will vary based on market conditions and effort.</p>
+          <p className="mt-2">APEX Operator License is a business opportunity, not a guarantee of income.</p>
         </div>
       </footer>
-      </div>
-    </>
+    </div>
   );
 }

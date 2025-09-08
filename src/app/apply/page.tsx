@@ -1,236 +1,383 @@
 'use client';
 
-import { useChat } from 'ai/react';
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Loader2, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import { ApexLogo } from '@/components/apex-logo';
+import { ArrowLeft, Lock, CreditCard, CheckCircle } from 'lucide-react';
+
+interface ApplicationData {
+  // Personal Info
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  
+  // Business Info
+  currentRevenue: string;
+  businessExperience: string;
+  desiredTerritory: string;
+  
+  // Qualifying Questions
+  capitalAvailable: string;
+  timelineToStart: string;
+  whyApply: string;
+  
+  // Agreement
+  agreedToTerms: boolean;
+}
 
 export default function ApplyPage() {
   const router = useRouter();
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/sales-agent',
-    initialMessages: [
-      {
-        id: '1',
-        role: 'assistant',
-        content: `Welcome to APEX.
-
-I'm here to understand your vision and determine if we're the right fit for your transformation.
-
-This isn't a typical application. It's a conversation between two professionals exploring a potential partnership.
-
-Let's start with something simple: What brings you here today?`,
-      },
-    ],
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [applicationData, setApplicationData] = useState<ApplicationData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    currentRevenue: '',
+    businessExperience: '',
+    desiredTerritory: '',
+    capitalAvailable: '',
+    timelineToStart: '',
+    whyApply: '',
+    agreedToTerms: false
   });
 
-  const [isTyping, setIsTyping] = useState(false);
-  const [hasCompletedConversation, setHasCompletedConversation] = useState(false);
-  const [showTransition, setShowTransition] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const updateField = (field: keyof ApplicationData, value: string | boolean) => {
+    setApplicationData(prev => ({ ...prev, [field]: value }));
   };
 
-  useEffect(() => {
-    scrollToBottom();
+  const canProceedToStep2 = () => {
+    return applicationData.firstName && 
+           applicationData.lastName && 
+           applicationData.email && 
+           applicationData.phone;
+  };
+
+  const canProceedToStep3 = () => {
+    return applicationData.currentRevenue && 
+           applicationData.businessExperience && 
+           applicationData.desiredTerritory;
+  };
+
+  const canSubmit = () => {
+    return applicationData.capitalAvailable && 
+           applicationData.timelineToStart && 
+           applicationData.whyApply && 
+           applicationData.agreedToTerms;
+  };
+
+  const handlePaymentAndSubmit = async () => {
+    if (!canSubmit()) return;
     
-    // Check if conversation has ended with the specific phrase
-    if (messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      const conversationText = messages.map(m => m.content).join(' ').toLowerCase();
+    setIsSubmitting(true);
+    
+    try {
+      // In production, integrate with Stripe for $97 payment
+      // For now, simulate payment success
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Check if we have collected email
-      const hasEmail = conversationText.includes('@');
+      // Store application data
+      sessionStorage.setItem('applicationData', JSON.stringify(applicationData));
       
-      // Check for the specific conclusion phrase
-      if (lastMessage.role === 'assistant' && 
-          lastMessage.content.toLowerCase().includes('this concludes our evaluation') &&
-          hasEmail) {
-        
-        setHasCompletedConversation(true);
-        
-        // Start transition after user reads the message
-        setTimeout(() => {
-          setShowTransition(true);
-          
-          // Redirect after transition
-          setTimeout(() => {
-            router.push('/apply/thank-you');
-          }, 3000);
-        }, 5000);
-      }
-    }
-  }, [messages, router]);
-
-  useEffect(() => {
-    if (isLoading) {
-      setIsTyping(true);
-    } else {
-      setIsTyping(false);
-    }
-  }, [isLoading]);
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(e as any);
+      // Redirect to sales page
+      router.push('/operator-license');
+      
+    } catch (error) {
+      console.error('Payment failed:', error);
+      alert('Payment processing failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col relative">
-      {/* Transition Overlay */}
-      <AnimatePresence>
-        {showTransition && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="absolute inset-0 z-50 bg-black flex items-center justify-center"
-          >
-            <div className="text-center">
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="text-2xl font-mono text-amber-500 mb-4"
-              >
-                Reviewing your application...
-              </motion.div>
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: 200 }}
-                transition={{ duration: 3, ease: "easeInOut" }}
-                className="h-1 bg-gradient-to-r from-amber-500 to-amber-600 mx-auto rounded-full"
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Header */}
+      <header className="px-4 py-6 border-b border-gray-200 sticky top-0 bg-white z-50">
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors">
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-sm">Back</span>
+          </Link>
+          <ApexLogo size="md" className="[&_div]:from-black [&_div]:to-gray-800" />
+          <div className="w-16" />
+        </div>
+      </header>
 
-      {/* Main Content */}
-      <motion.div
-        animate={{ opacity: showTransition ? 0.3 : 1 }}
-        transition={{ duration: 1 }}
-        className="flex-1 flex flex-col"
-      >
-        {/* Header */}
-        <header className="sticky top-0 z-20 bg-black/80 backdrop-blur-md border-b border-gray-900">
-          <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 text-gray-400 hover:text-gray-300 transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm font-mono">Exit</span>
-            </Link>
-            <ApexLogo size="sm" className="[&_div[class*='from-professional-blue']]:from-amber-500 [&_div[class*='to-professional-blue']]:to-amber-600 [&_div[class*='border-professional-blue']]:border-amber-500 [&_div[class*='text-professional-blue']]:text-amber-500" />
-            <div className="w-16" /> {/* Spacer for centering */}
-          </div>
-        </header>
-
-      {/* Chat Container */}
-      <div className="flex-1 max-w-3xl w-full mx-auto px-4 py-8">
-        <div className="space-y-6">
-          {messages.map((message) => (
-            <motion.div
-              key={message.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[80%] ${
-                  message.role === 'user'
-                    ? 'bg-gradient-to-br from-amber-500/20 to-amber-600/10 border border-amber-500/20 text-gray-100'
-                    : 'bg-gradient-to-br from-gray-900/50 to-gray-900/30 border border-gray-800 text-gray-300'
-                } rounded-2xl px-6 py-4 shadow-lg`}
-              >
-                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+      {/* Progress Bar */}
+      <div className="bg-gray-100 py-4 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
+                {currentStep > 1 ? <CheckCircle className="w-5 h-5" /> : '1'}
               </div>
-            </motion.div>
-          ))}
-
-          {/* Typing Indicator */}
-          <AnimatePresence>
-            {isTyping && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="flex justify-start"
-              >
-                <div className="bg-gradient-to-br from-gray-900/50 to-gray-900/30 border border-gray-800 rounded-2xl px-6 py-4">
-                  <div className="flex gap-1">
-                    <motion.div
-                      animate={{ opacity: [0.4, 1, 0.4] }}
-                      transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-                      className="w-2 h-2 bg-gray-500 rounded-full"
-                    />
-                    <motion.div
-                      animate={{ opacity: [0.4, 1, 0.4] }}
-                      transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
-                      className="w-2 h-2 bg-gray-500 rounded-full"
-                    />
-                    <motion.div
-                      animate={{ opacity: [0.4, 1, 0.4] }}
-                      transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-                      className="w-2 h-2 bg-gray-500 rounded-full"
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <div ref={messagesEndRef} />
+              <span className={`text-sm ${currentStep >= 1 ? 'font-semibold' : 'text-gray-500'}`}>Personal Info</span>
+            </div>
+            <div className="flex-1 h-1 bg-gray-300 mx-4">
+              <div className={`h-full bg-blue-600 transition-all duration-300`} style={{ width: currentStep >= 2 ? '100%' : '0%' }} />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
+                {currentStep > 2 ? <CheckCircle className="w-5 h-5" /> : '2'}
+              </div>
+              <span className={`text-sm ${currentStep >= 2 ? 'font-semibold' : 'text-gray-500'}`}>Business Info</span>
+            </div>
+            <div className="flex-1 h-1 bg-gray-300 mx-4">
+              <div className={`h-full bg-blue-600 transition-all duration-300`} style={{ width: currentStep >= 3 ? '100%' : '0%' }} />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-300 text-gray-600'}`}>
+                {currentStep > 3 ? <CheckCircle className="w-5 h-5" /> : '3'}
+              </div>
+              <span className={`text-sm ${currentStep >= 3 ? 'font-semibold' : 'text-gray-500'}`}>Qualification</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Input Area */}
-      <div className="sticky bottom-0 bg-gradient-to-t from-black via-black/95 to-transparent pt-8 pb-6">
-        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto px-4">
-          <div className="relative">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              placeholder="Share your thoughts..."
-              disabled={isLoading}
-              rows={1}
-              className="w-full bg-gray-900/50 border border-gray-800 rounded-2xl pl-6 pr-14 py-4 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-amber-500/50 transition-all duration-300 resize-none min-h-[56px] backdrop-blur-sm"
-              style={{
-                height: 'auto',
-                overflowY: 'hidden',
-              }}
-              onInput={(e) => {
-                const target = e.target as HTMLTextAreaElement;
-                target.style.height = 'auto';
-                target.style.height = `${target.scrollHeight}px`;
-              }}
-            />
-            <button
-              type="submit"
-              disabled={isLoading || !input.trim() || hasCompletedConversation}
-              className="absolute right-3 bottom-3 p-2 bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl text-black transition-all duration-300 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+      {/* Form Content */}
+      <div className="max-w-2xl mx-auto px-4 py-12">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-4">Apply for APEX Operator License</h1>
+          <p className="text-gray-600">Complete this application to see if you qualify for territory rights</p>
+        </div>
+
+        {currentStep === 1 && (
+          <div className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">First Name *</label>
+                <input
+                  type="text"
+                  value={applicationData.firstName}
+                  onChange={(e) => updateField('firstName', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Last Name *</label>
+                <input
+                  type="text"
+                  value={applicationData.lastName}
+                  onChange={(e) => updateField('lastName', e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-2">Email *</label>
+              <input
+                type="email"
+                value={applicationData.email}
+                onChange={(e) => updateField('email', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                required
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-2">Phone *</label>
+              <input
+                type="tel"
+                value={applicationData.phone}
+                onChange={(e) => updateField('phone', e.target.value)}
+                placeholder="+1 (555) 123-4567"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                required
+              />
+            </div>
+
+            <Button
+              onClick={() => setCurrentStep(2)}
+              disabled={!canProceedToStep2()}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
             >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <Send className="w-5 h-5" />
-              )}
-            </button>
+              Continue to Business Info →
+            </Button>
           </div>
-          <p className="text-center text-xs text-gray-600 mt-4 font-mono">
-            Your responses are being evaluated in real-time
-          </p>
-        </form>
+        )}
+
+        {currentStep === 2 && (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium mb-2">Current Monthly Revenue *</label>
+              <select
+                value={applicationData.currentRevenue}
+                onChange={(e) => updateField('currentRevenue', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                required
+              >
+                <option value="">Select revenue range</option>
+                <option value="0">$0 - Not started yet</option>
+                <option value="1-10k">$1,000 - $10,000/month</option>
+                <option value="10-30k">$10,000 - $30,000/month</option>
+                <option value="30-50k">$30,000 - $50,000/month</option>
+                <option value="50k+">$50,000+/month</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Business Experience *</label>
+              <select
+                value={applicationData.businessExperience}
+                onChange={(e) => updateField('businessExperience', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                required
+              >
+                <option value="">Select your experience</option>
+                <option value="none">No business experience</option>
+                <option value="employee">Currently employed, want to start</option>
+                <option value="contractor">Contractor/Freelancer</option>
+                <option value="business-owner">Business owner (non-service)</option>
+                <option value="service-owner">Service business owner</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Desired Territory *</label>
+              <input
+                type="text"
+                value={applicationData.desiredTerritory}
+                onChange={(e) => updateField('desiredTerritory', e.target.value)}
+                placeholder="e.g. Phoenix, AZ or Miami, FL"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">Enter your preferred city and state</p>
+            </div>
+
+            <div className="flex gap-4">
+              <Button
+                onClick={() => setCurrentStep(1)}
+                variant="outline"
+                className="flex-1 border-gray-300"
+              >
+                ← Back
+              </Button>
+              <Button
+                onClick={() => setCurrentStep(3)}
+                disabled={!canProceedToStep3()}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Continue to Qualification →
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 3 && (
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium mb-2">Capital Available for Investment *</label>
+              <select
+                value={applicationData.capitalAvailable}
+                onChange={(e) => updateField('capitalAvailable', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                required
+              >
+                <option value="">Select capital range</option>
+                <option value="<10k">Less than $10,000</option>
+                <option value="10-25k">$10,000 - $25,000</option>
+                <option value="25-50k">$25,000 - $50,000</option>
+                <option value="50-100k">$50,000 - $100,000</option>
+                <option value="100k+">$100,000+</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Timeline to Start *</label>
+              <select
+                value={applicationData.timelineToStart}
+                onChange={(e) => updateField('timelineToStart', e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                required
+              >
+                <option value="">Select timeline</option>
+                <option value="immediately">Immediately</option>
+                <option value="1-month">Within 1 month</option>
+                <option value="3-months">Within 3 months</option>
+                <option value="6-months">Within 6 months</option>
+                <option value="exploring">Just exploring options</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Why do you want to become an APEX Operator? *</label>
+              <textarea
+                value={applicationData.whyApply}
+                onChange={(e) => updateField('whyApply', e.target.value)}
+                rows={4}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                placeholder="Tell us about your goals and why you're interested in the APEX system..."
+                required
+              />
+            </div>
+
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={applicationData.agreedToTerms}
+                  onChange={(e) => updateField('agreedToTerms', e.target.checked)}
+                  className="mt-1"
+                />
+                <span className="text-sm text-gray-700">
+                  I understand this is a serious business opportunity requiring a $6,997 investment 
+                  (payment plans available) and I'm prepared to commit to the 30-day launch process. 
+                  I agree to pay the $97 application fee to have my application reviewed.
+                </span>
+              </label>
+            </div>
+
+            <div className="border-t pt-6">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <CreditCard className="w-5 h-5 text-yellow-700" />
+                  <div>
+                    <p className="font-semibold text-yellow-900">Application Fee: $97</p>
+                    <p className="text-sm text-yellow-800">One-time fee. Instant approval if qualified.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <Button
+                  onClick={() => setCurrentStep(2)}
+                  variant="outline"
+                  className="flex-1 border-gray-300"
+                >
+                  ← Back
+                </Button>
+                <Button
+                  onClick={handlePaymentAndSubmit}
+                  disabled={!canSubmit() || isSubmitting}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Processing Payment...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      <Lock className="w-4 h-4" />
+                      Pay $97 & Submit Application
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-      </motion.div>
     </div>
   );
 }
