@@ -151,7 +151,7 @@ export default function ApplyPage() {
           <div className="space-y-6">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2">First Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
                 <input
                   type="text"
                   value={applicationData.firstName}
@@ -161,7 +161,7 @@ export default function ApplyPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">Last Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
                 <input
                   type="text"
                   value={applicationData.lastName}
@@ -173,7 +173,7 @@ export default function ApplyPage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-2">Email *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
               <input
                 type="email"
                 value={applicationData.email}
@@ -184,7 +184,7 @@ export default function ApplyPage() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-2">Phone *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
               <input
                 type="tel"
                 value={applicationData.phone}
@@ -208,7 +208,7 @@ export default function ApplyPage() {
         {currentStep === 2 && (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2">Current Monthly Revenue *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Current Monthly Revenue *</label>
               <select
                 value={applicationData.currentRevenue}
                 onChange={(e) => updateField('currentRevenue', e.target.value)}
@@ -225,7 +225,7 @@ export default function ApplyPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Business Experience *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Business Experience *</label>
               <select
                 value={applicationData.businessExperience}
                 onChange={(e) => updateField('businessExperience', e.target.value)}
@@ -242,7 +242,7 @@ export default function ApplyPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Desired Territory *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Desired Territory *</label>
               <input
                 type="text"
                 value={applicationData.desiredTerritory}
@@ -276,7 +276,7 @@ export default function ApplyPage() {
         {currentStep === 3 && (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-2">Capital Available for Investment *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Capital Available for Investment *</label>
               <select
                 value={applicationData.capitalAvailable}
                 onChange={(e) => updateField('capitalAvailable', e.target.value)}
@@ -293,7 +293,7 @@ export default function ApplyPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Timeline to Start *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Timeline to Start *</label>
               <select
                 value={applicationData.timelineToStart}
                 onChange={(e) => updateField('timelineToStart', e.target.value)}
@@ -310,7 +310,7 @@ export default function ApplyPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Why do you want to become an APEX Operator? *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Why do you want to become an APEX Operator? *</label>
               <textarea
                 value={applicationData.whyApply}
                 onChange={(e) => updateField('whyApply', e.target.value)}
@@ -340,10 +340,10 @@ export default function ApplyPage() {
             <div className="border-t pt-6">
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
                 <div className="flex items-center gap-3">
-                  <CreditCard className="w-5 h-5 text-yellow-700" />
+                  <CreditCard className="w-5 h-5 text-blue-600" />
                   <div>
-                    <p className="font-semibold text-yellow-900">Application Fee: $97</p>
-                    <p className="text-sm text-yellow-800">One-time fee. Instant approval if qualified.</p>
+                    <p className="font-semibold text-gray-900">Application Fee: $97</p>
+                    <p className="text-sm text-gray-600">One-time fee. Instant approval if qualified.</p>
                   </div>
                 </div>
               </div>
