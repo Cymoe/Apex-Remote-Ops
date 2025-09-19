@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,7 @@ export default function ApplyPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVideoBuyer, setIsVideoBuyer] = useState(false);
   const [applicationData, setApplicationData] = useState<ApplicationData>({
     firstName: '',
     lastName: '',
@@ -45,6 +46,52 @@ export default function ApplyPage() {
     whyApply: '',
     agreedToTerms: false
   });
+
+  // Check if user is a video buyer and pre-fill data
+  useEffect(() => {
+    // Only check for video buyer data if coming from the landing page
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromVideo = urlParams.get('from') === 'video';
+    
+    if (fromVideo) {
+      // First check localStorage for recent data
+      const videoBuyerData = localStorage.getItem('videoBuyerData');
+      if (videoBuyerData) {
+        const parsed = JSON.parse(videoBuyerData);
+        
+        // Also verify with database
+        fetch(`/api/purchases/check-video-buyer?email=${encodeURIComponent(parsed.email)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.isVideoBuyer) {
+              setIsVideoBuyer(true);
+              setApplicationData(prev => ({
+                ...prev,
+                firstName: data.purchaseData.firstName || parsed.firstName || '',
+                lastName: data.purchaseData.lastName || parsed.lastName || '',
+                email: data.purchaseData.email || parsed.email || '',
+                desiredTerritory: data.purchaseData.territory || parsed.territory || ''
+              }));
+              // Skip to business info for video buyers (they already gave personal info)
+              setCurrentStep(2);
+            }
+          })
+          .catch(err => {
+            console.error('Error checking video buyer status:', err);
+            // Fall back to localStorage data
+            setIsVideoBuyer(true);
+            setApplicationData(prev => ({
+              ...prev,
+              firstName: parsed.firstName || '',
+              lastName: parsed.lastName || '',
+              email: parsed.email || '',
+              desiredTerritory: parsed.territory || ''
+            }));
+            setCurrentStep(2);
+          });
+      }
+    }
+  }, []);
 
   const updateField = (field: keyof ApplicationData, value: string | boolean) => {
     setApplicationData(prev => ({ ...prev, [field]: value }));
@@ -76,19 +123,34 @@ export default function ApplyPage() {
     setIsSubmitting(true);
     
     try {
-      // In production, integrate with Stripe for $97 payment
-      // For now, simulate payment success
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Submit application to backend
+      const response = await fetch('/api/applications/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(applicationData),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Submission failed');
+      }
+
+      // Store application data for thank you page
+      sessionStorage.setItem('applicationData', JSON.stringify({
+        ...applicationData,
+        applicationId: result.applicationId,
+      }));
       
-      // Store application data
-      sessionStorage.setItem('applicationData', JSON.stringify(applicationData));
-      
-      // Redirect to sales page
-      router.push('/operator-license');
+      // In production, integrate with Stripe for $97 payment here
+      // For now, redirect to thank you page
+      router.push('/apply/thank-you');
       
     } catch (error) {
-      console.error('Payment failed:', error);
-      alert('Payment processing failed. Please try again.');
+      console.error('Submission failed:', error);
+      alert('Application submission failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -142,9 +204,31 @@ export default function ApplyPage() {
 
       {/* Form Content */}
       <div className="max-w-2xl mx-auto px-4 py-12">
+        {/* Special Message for Video Buyers */}
+        {isVideoBuyer && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-green-900">Welcome Back, Video Buyer!</p>
+                <p className="text-sm text-green-700 mt-1">
+                  Your $497 video purchase counts toward the full program. 
+                  We've pre-filled your information to make this quick.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-4">Apply for APEX Operator License</h1>
-          <p className="text-gray-600">Complete this application to see if you qualify for territory rights</p>
+          <h1 className="text-3xl font-bold mb-4">
+            {isVideoBuyer ? 'Upgrade to Full Implementation' : 'Apply for APEX Operator License'}
+          </h1>
+          <p className="text-gray-600">
+            {isVideoBuyer 
+              ? 'Get done-for-you setup, protected territory, and personal coaching'
+              : 'Complete this application to see if you qualify for territory rights'}
+          </p>
         </div>
 
         {currentStep === 1 && (
@@ -156,7 +240,7 @@ export default function ApplyPage() {
                   type="text"
                   value={applicationData.firstName}
                   onChange={(e) => updateField('firstName', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white text-gray-900"
                   required
                 />
               </div>
@@ -166,7 +250,7 @@ export default function ApplyPage() {
                   type="text"
                   value={applicationData.lastName}
                   onChange={(e) => updateField('lastName', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white text-gray-900"
                   required
                 />
               </div>
@@ -178,7 +262,7 @@ export default function ApplyPage() {
                 type="email"
                 value={applicationData.email}
                 onChange={(e) => updateField('email', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white text-gray-900"
                 required
               />
             </div>
@@ -190,7 +274,7 @@ export default function ApplyPage() {
                 value={applicationData.phone}
                 onChange={(e) => updateField('phone', e.target.value)}
                 placeholder="+1 (555) 123-4567"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white text-gray-900"
                 required
               />
             </div>
@@ -212,7 +296,7 @@ export default function ApplyPage() {
               <select
                 value={applicationData.currentRevenue}
                 onChange={(e) => updateField('currentRevenue', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white text-gray-900"
                 required
               >
                 <option value="">Select revenue range</option>
@@ -229,7 +313,7 @@ export default function ApplyPage() {
               <select
                 value={applicationData.businessExperience}
                 onChange={(e) => updateField('businessExperience', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white text-gray-900"
                 required
               >
                 <option value="">Select your experience</option>
@@ -248,7 +332,7 @@ export default function ApplyPage() {
                 value={applicationData.desiredTerritory}
                 onChange={(e) => updateField('desiredTerritory', e.target.value)}
                 placeholder="e.g. Phoenix, AZ or Miami, FL"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white text-gray-900"
                 required
               />
               <p className="text-xs text-gray-500 mt-1">Enter your preferred city and state</p>
@@ -258,7 +342,7 @@ export default function ApplyPage() {
               <Button
                 onClick={() => setCurrentStep(1)}
                 variant="outline"
-                className="flex-1 border-gray-300"
+                className="flex-1 border-gray-300 bg-white hover:bg-gray-50 text-gray-700"
               >
                 ← Back
               </Button>
@@ -280,7 +364,7 @@ export default function ApplyPage() {
               <select
                 value={applicationData.capitalAvailable}
                 onChange={(e) => updateField('capitalAvailable', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white text-gray-900"
                 required
               >
                 <option value="">Select capital range</option>
@@ -297,7 +381,7 @@ export default function ApplyPage() {
               <select
                 value={applicationData.timelineToStart}
                 onChange={(e) => updateField('timelineToStart', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white text-gray-900"
                 required
               >
                 <option value="">Select timeline</option>
@@ -315,7 +399,7 @@ export default function ApplyPage() {
                 value={applicationData.whyApply}
                 onChange={(e) => updateField('whyApply', e.target.value)}
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 bg-white text-gray-900"
                 placeholder="Tell us about your goals and why you're interested in the APEX system..."
                 required
               />
@@ -352,7 +436,7 @@ export default function ApplyPage() {
                 <Button
                   onClick={() => setCurrentStep(2)}
                   variant="outline"
-                  className="flex-1 border-gray-300"
+                  className="flex-1 border-gray-300 bg-white hover:bg-gray-50 text-gray-700"
                 >
                   ← Back
                 </Button>

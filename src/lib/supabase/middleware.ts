@@ -68,13 +68,14 @@ export async function updateSession(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Protected routes
-  if (request.nextUrl.pathname.startsWith('/(app)') || 
+  // Protected routes (excluding landing pages)
+  if ((request.nextUrl.pathname.startsWith('/(app)') || 
       request.nextUrl.pathname.startsWith('/dashboard') ||
       request.nextUrl.pathname.startsWith('/courses') ||
       request.nextUrl.pathname.startsWith('/chat') ||
       request.nextUrl.pathname.startsWith('/community') ||
-      request.nextUrl.pathname.startsWith('/settings')) {
+      request.nextUrl.pathname.startsWith('/settings')) &&
+      !request.nextUrl.pathname.startsWith('/lp')) {
     if (!user) {
       return NextResponse.redirect(new URL('/auth/sign-in', request.url));
     }

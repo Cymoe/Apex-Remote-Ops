@@ -12,8 +12,26 @@ import Link from 'next/link';
 import { MobileNav } from '@/components/mobile-nav';
 
 export async function Header() {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let user = null;
+  
+  try {
+    const supabase = await createClient();
+    
+    if (!supabase || !supabase.auth) {
+      console.error('Supabase client not properly initialized');
+      return null;
+    }
+    
+    const { data, error } = await supabase.auth.getUser();
+    
+    if (error) {
+      console.error('Error fetching user:', error);
+    } else {
+      user = data?.user;
+    }
+  } catch (error) {
+    console.error('Header component error:', error);
+  }
 
   const userInitial = user?.email?.charAt(0).toUpperCase() || '?';
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
@@ -39,7 +57,7 @@ export async function Header() {
           <DropdownMenuLabel className="text-pure-white font-normal">
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">{userName}</p>
-              <p className="text-xs leading-none text-medium-gray">{user?.email}</p>
+              <p className="text-xs leading-none text-medium-gray">{user?.email || 'Not logged in'}</p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator className="bg-slate-gray" />

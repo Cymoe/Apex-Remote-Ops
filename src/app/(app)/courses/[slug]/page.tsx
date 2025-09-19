@@ -16,7 +16,7 @@ import {
   Menu
 } from 'lucide-react';
 import Link from 'next/link';
-import { VideoSection } from '@/components/course/video-section';
+import { VideoSection } from '@/components/course/video-section';l
 import ProgressTracker from '@/components/progress-tracker';
 import { CourseHeader } from '@/components/course/course-header';
 import { EmptyModuleSection } from '@/components/course/empty-module-section';
@@ -137,11 +137,11 @@ export default async function CourseDetailPage({ params, searchParams }: CourseD
     }
   });
 
-  // Module is accessible if it's the first module, or if any module at or after its index has been completed
-  const isModuleAccessible = currentModuleIndex === 0 || currentModuleIndex <= highestCompletedIndex + 1;
+  // REMOVED LOCKING - All modules are now accessible for development
+  const isModuleAccessible = true;
   
   // Keep the old variable name for backward compatibility
-  const isPreviousModuleCompleted = isModuleAccessible;
+  const isPreviousModuleCompleted = true;
 
   return (
     <div className="-m-4 sm:-m-6 lg:-m-8">

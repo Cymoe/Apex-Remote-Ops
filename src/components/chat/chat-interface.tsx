@@ -16,7 +16,7 @@ interface ChatInterfaceProps {
 export function ChatInterface({ conversationId }: ChatInterfaceProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/chat',
+    api: '/api/sales-agent',
     body: {
       conversationId,
     },

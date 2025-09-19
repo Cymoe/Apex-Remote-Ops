@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ApexLogo } from '@/components/apex-logo';
-import { CheckCircle, Clock, Loader2 } from 'lucide-react';
+import { CheckCircle, Clock, Loader2, Mail } from 'lucide-react';
 
 export default function ApplicationProcessingPage() {
   const router = useRouter();
@@ -14,7 +14,7 @@ export default function ApplicationProcessingPage() {
   const processingSteps = [
     "Verifying application details...",
     "Checking territory availability...",
-    "Processing application fee...",
+    "Sending confirmation email...",
     "Reviewing qualification criteria...",
     "Preparing your results..."
   ];
@@ -98,9 +98,13 @@ export default function ApplicationProcessingPage() {
                 <h2 className="text-3xl font-bold mb-4 text-green-400">
                   Congratulations! You're Approved
                 </h2>
-                <p className="text-xl mb-2">
+                <p className="text-xl mb-4">
                   {applicationData?.desiredTerritory} is available!
                 </p>
+                <div className="flex items-center justify-center gap-2 mb-4 text-amber-400">
+                  <Mail className="w-5 h-5" />
+                  <span>Check your email for confirmation and next steps</span>
+                </div>
                 <p className="text-gray-400">Redirecting to your offer page...</p>
               </>
             ) : (

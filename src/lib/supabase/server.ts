@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClient() {
+export async function createClient() {
   // Validate environment variables
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -10,18 +10,18 @@ export function createClient() {
     throw new Error('Missing Supabase environment variables. Please check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.')
   }
 
+  const cookieStore = await cookies()
+
   return createServerClient(
     supabaseUrl,
     supabaseAnonKey,
     {
       cookies: {
-        async get(name: string) {
-          const cookieStore = await cookies()
+        get(name: string) {
           return cookieStore.get(name)?.value
         },
-        async set(name: string, value: string, options: CookieOptions) {
+        set(name: string, value: string, options: CookieOptions) {
           try {
-            const cookieStore = await cookies()
             cookieStore.set({ name, value, ...options })
           } catch (error) {
             // The `set` method was called from a Server Component.
@@ -29,9 +29,8 @@ export function createClient() {
             // user sessions.
           }
         },
-        async remove(name: string, options: CookieOptions) {
+        remove(name: string, options: CookieOptions) {
           try {
-            const cookieStore = await cookies()
             cookieStore.set({ name, value: '', ...options })
           } catch (error) {
             // The `delete` method was called from a Server Component.

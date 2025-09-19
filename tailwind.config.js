@@ -73,7 +73,6 @@ module.exports = {
   		},
   		fontFamily: {
   			'sans': ['var(--font-inter)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-  			'serif': ['var(--font-serif)', 'Playfair Display', 'Georgia', 'serif'],
   			'mono': ['var(--font-mono)', 'JetBrains Mono', 'monospace']
   		},
   		keyframes: {
@@ -114,5 +113,5 @@ module.exports = {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("tailwind-scrollbar")],
 }

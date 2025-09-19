@@ -233,7 +233,8 @@ export function EnhancedSidebar({
                     {sectionModules.map((module, sectionIndex) => {
                       const globalIndex = modules.findIndex(m => m.id === module.id);
                       const isCompleted = userProgress.get(module.id)?.completed;
-                      const isLocked = globalIndex > 0 && globalIndex > highestCompletedIndex + 1;
+                      // REMOVED LOCKING - All modules are now accessible for development
+                      const isLocked = false;
                       const isCurrent = module.id === currentModuleId;
                       
                       const ModuleContent = (

@@ -344,9 +344,9 @@ export default function WelcomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               className="bg-amber-500 hover:bg-amber-600 text-black"
-              onClick={() => window.location.href = '/operator-portal'}
+              onClick={() => window.location.href = '/dashboard'}
             >
-              Go to Operator Portal →
+              Access Dashboard →
             </Button>
             <Button 
               variant="outline"
