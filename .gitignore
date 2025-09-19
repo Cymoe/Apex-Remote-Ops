@@ -91,3 +91,5 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+# Agent service (contains sensitive data)
+agent-service/
