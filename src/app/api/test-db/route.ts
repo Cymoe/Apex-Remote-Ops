@@ -17,7 +17,7 @@ export async function GET() {
     const { createClient } = await import('@/lib/supabase/server');
     
     try {
-      const supabase = createClient();
+      const supabase = await createClient();
       
       // Test auth
       const { data: { user }, error: authError } = await supabase.auth.getUser();

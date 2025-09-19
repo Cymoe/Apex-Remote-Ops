@@ -11,7 +11,7 @@ interface PageProps {
 export default async function AdminModulesPage({ params }: PageProps) {
   try {
     const resolvedParams = await params;
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Check if user is authenticated
     const { data: { user } } = await supabase.auth.getUser();

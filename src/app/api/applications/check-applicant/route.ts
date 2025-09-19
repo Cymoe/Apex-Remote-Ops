@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check if user has an existing application
     const { data: application, error } = await supabase

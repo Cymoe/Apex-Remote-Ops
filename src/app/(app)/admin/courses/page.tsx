@@ -19,7 +19,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default async function AdminCoursesPage() {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Check if user is authenticated
     const { data: { user }, error: authError } = await supabase.auth.getUser();

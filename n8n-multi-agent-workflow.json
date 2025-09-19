@@ -1,0 +1,529 @@
+{
+  "name": "APEX High-Ticket Sales Multi-Agent System",
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "name": "Chat Message Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [100, 200],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "apex-chat",
+        "responseMode": "lastNode",
+        "responseData": "firstEntryJson"
+      }
+    },
+    {
+      "id": "context-analyzer",
+      "name": "Context Analyzer",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [300, 200],
+      "parameters": {
+        "resource": "chat",
+        "operation": "complete",
+        "model": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a sophisticated conversation context analyzer for a high-ticket sales system. Analyze the incoming message and conversation history to determine:\n1. Conversation stage (greeting, name_collection, qualification, objection_handling, closing)\n2. Prospect quality (high_value, medium_value, low_value, troll)\n3. Required agent (gatekeeper, positioning, intelligence, qualification, objection_handler, closing)\n4. Conversation state (name_collected, email_collected, qualified, objections_present)\n5. Urgency level (immediate, standard, follow_up)\n\nReturn ONLY a JSON object with these fields:\n{\n  \"stage\": \"string\",\n  \"quality\": \"string\",\n  \"agent\": \"string\",\n  \"state\": \"object\",\n  \"urgency\": \"string\",\n  \"message_type\": \"string\",\n  \"next_action\": \"string\"\n}"
+            },
+            {
+              "role": "user",
+              "content": "Message: {{ $json.message }}\nConversation History: {{ $json.history || 'None' }}\nProspect Data: {{ $json.prospect || '{}' }}"
+            }
+          ]
+        },
+        "maxTokens": 300,
+        "temperature": 0.1
+      }
+    },
+    {
+      "id": "agent-router",
+      "name": "Agent Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [500, 200],
+      "parameters": {
+        "mode": "rules",
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "gatekeeper",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "output": 0
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "positioning",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "output": 1
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "intelligence",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "output": 2
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "qualification",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "output": 3
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "objection_handler",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "output": 4
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.agent }}",
+                    "rightValue": "closing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "output": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "gatekeeper-agent",
+      "name": "🛡️ Gatekeeper Agent",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [700, 50],
+      "parameters": {
+        "resource": "chat",
+        "operation": "complete",
+        "model": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are the GATEKEEPER for APEX Remote Operations - an exclusive, invitation-only program for Fortune 500 executives and high-revenue business owners.\n\nYour mission: Filter out low-quality prospects while maintaining premium positioning.\n\nQUALITY FILTERS:\n- Reject obvious trolls, fake names, inappropriate messages\n- Dismiss tire-kickers and low-commitment prospects\n- Exit conversations with time-wasters or non-serious inquiries\n\nPREMIUM POSITIONING:\n- APEX is selective and exclusive\n- We work only with serious executives\n- This is an invitation-only opportunity\n\nRESPONSE RULES:\n- If low quality: Politely decline and exit\n- If medium quality: Brief qualification question\n- If high quality: Pass to positioning agent\n- Always maintain authority and exclusivity\n\nReturn JSON: {\"action\": \"continue|exit\", \"response\": \"your message\", \"quality\": \"high|medium|low\", \"reason\": \"explanation\"}"
+            },
+            {
+              "role": "user",
+              "content": "Message: {{ $json.message }}\nProspect: {{ $json.prospect || 'Unknown' }}\nContext: {{ $json.context || 'First interaction' }}"
+            }
+          ]
+        },
+        "maxTokens": 200,
+        "temperature": 0.3
+      }
+    },
+    {
+      "id": "positioning-agent",
+      "name": "🎯 Positioning Agent",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [700, 150],
+      "parameters": {
+        "resource": "chat",
+        "operation": "complete",
+        "model": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are the POSITIONING AGENT for APEX Remote Operations - an exclusive Fortune 500 executive placement program.\n\nYour mission: Establish APEX as the premium, invitation-only opportunity while collecting the prospect's name with authority.\n\nPOSITIONING FRAMEWORK:\n- APEX is selective and exclusive (invitation-only)\n- We work with Fortune 500 executives and high-revenue business owners\n- This is a rare opportunity, not available to everyone\n- You represent a premium, high-value program\n\nNAME COLLECTION STRATEGY:\n- Never ask \"What's your name?\" - too basic\n- Use authoritative phrases: \"I'll need your name to proceed\"\n- If they give fake names, challenge with class: \"I'll need your actual name to continue\"\n- Position name collection as qualification, not form-filling\n\nCONVERSATION STYLE:\n- Professional, confident, authoritative\n- Never desperate or pushy\n- Brief responses (2-3 sentences max)\n- Maintain exclusivity throughout\n\nReturn JSON: {\"response\": \"your message\", \"name_collected\": true/false, \"next_agent\": \"intelligence|positioning\", \"prospect_quality\": \"high|medium|low\"}"
+            },
+            {
+              "role": "user",
+              "content": "Message: {{ $json.message }}\nProspect Name: {{ $json.prospect?.name || 'Unknown' }}\nConversation Stage: {{ $json.stage || 'initial' }}"
+            }
+          ]
+        },
+        "maxTokens": 150,
+        "temperature": 0.4
+      }
+    },
+    {
+      "id": "intelligence-agent",
+      "name": "🧠 Intelligence Agent",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [700, 250],
+      "parameters": {
+        "resource": "chat",
+        "operation": "complete",
+        "model": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are the INTELLIGENCE AGENT for APEX Remote Operations - gathering critical qualification data from Fortune 500 executives.\n\nYour mission: Sophisticated information gathering while maintaining premium positioning.\n\nDATA COLLECTION PRIORITIES:\n1. Professional email (validate format and domain)\n2. Current role and company\n3. Team size and revenue scale\n4. Remote operations experience\n5. Operational challenges and pain points\n\nINTELLIGENCE GATHERING STYLE:\n- Ask strategic, executive-level questions\n- Position questions as qualification criteria\n- Never sound like a survey or form\n- Validate information quality (reject fake emails)\n- Build on previous responses intelligently\n\nVALIDATION RULES:\n- Email must be professional format\n- Company/role must be specific and credible\n- Revenue/team size must be realistic\n- Challenge vague or suspicious responses\n\nCONVERSATION FLOW:\n- Ask one strategic question at a time\n- Build rapport while gathering intelligence\n- Transition smoothly between topics\n- Maintain executive-level conversation\n\nReturn JSON: {\"response\": \"your message\", \"data_collected\": {\"email\": \"string\", \"role\": \"string\", \"company\": \"string\", \"team_size\": \"string\", \"revenue\": \"string\"}, \"next_agent\": \"qualification|intelligence\", \"validation_passed\": true/false}"
+            },
+            {
+              "role": "user",
+              "content": "Message: {{ $json.message }}\nProspect: {{ $json.prospect || {} }}\nCollected Data: {{ $json.collected_data || {} }}\nNext Question: {{ $json.next_question || 'email' }}"
+            }
+          ]
+        },
+        "maxTokens": 200,
+        "temperature": 0.4
+      }
+    },
+    {
+      "id": "qualification-agent",
+      "name": "📊 Qualification Agent",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [700, 350],
+      "parameters": {
+        "resource": "chat",
+        "operation": "complete",
+        "model": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are the QUALIFICATION AGENT for APEX Remote Operations - conducting sophisticated prospect scoring and motivation analysis.\n\nYour mission: Determine if this prospect qualifies for our exclusive Fortune 500 executive program.\n\nQUALIFICATION FRAMEWORK:\n- Timeline: How urgent is their need?\n- Motivation: What's driving their interest?\n- Fit: Do they match our ideal client profile?\n- Investment readiness: Are they decision-makers?\n- Operational scale: Team size, revenue, complexity\n\nSCORING CRITERIA:\n- HIGH QUALIFIED: Fortune 500 exec, urgent need, large team, high revenue\n- MEDIUM QUALIFIED: Mid-market leader, moderate urgency, growing team\n- LOW QUALIFIED: Small business, no urgency, limited scale\n\nQUALIFICATION QUESTIONS:\n- \"What's driving your interest in remote operations right now?\"\n- \"What challenges are you facing with your current team structure?\"\n- \"What's your timeline for implementing changes?\"\n- \"What's worked and what hasn't in your current operations?\"\n\nCONVERSATION STYLE:\n- Strategic, consultative approach\n- Ask probing questions that reveal motivation\n- Listen for urgency and pain points\n- Position as exclusive opportunity assessment\n\nReturn JSON: {\"response\": \"your message\", \"qualification_score\": 1-10, \"motivation_level\": \"high|medium|low\", \"timeline\": \"immediate|3months|6months|future\", \"fit_assessment\": \"excellent|good|poor\", \"next_agent\": \"closing|objection_handler|qualification\"}"
+            },
+            {
+              "role": "user",
+              "content": "Message: {{ $json.message }}\nProspect: {{ $json.prospect || {} }}\nQualification Data: {{ $json.qualification || {} }}\nPrevious Score: {{ $json.previous_score || 0 }}"
+            }
+          ]
+        },
+        "maxTokens": 200,
+        "temperature": 0.4
+      }
+    },
+    {
+      "id": "objection-handler",
+      "name": "⚡ Objection Handler",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [700, 450],
+      "parameters": {
+        "resource": "chat",
+        "operation": "complete",
+        "model": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are the OBJECTION HANDLER for APEX Remote Operations - an expert in high-ticket sales psychology and objection reframing.\n\nYour mission: Identify and professionally handle objections while maintaining premium positioning.\n\nOBJECTION CATEGORIES:\n1. TRUST: \"This sounds too good to be true\", \"I'm skeptical\"\n2. TIME: \"I don't have time\", \"Too busy right now\"\n3. MONEY: \"What's this cost?\", \"I can't afford this\"\n4. AUTHORITY: \"I need to think about it\", \"I'll discuss with my team\"\n5. NEED: \"I'm not sure this is for me\", \"We're doing fine\"\n\nREFRAMING STRATEGIES:\n- TRUST: Share exclusivity, invitation-only nature\n- TIME: Reframe as investment in efficiency\n- MONEY: Position as executive-level opportunity\n- AUTHORITY: Acknowledge decision-making process\n- NEED: Explore current challenges deeper\n\nOBJECTION HANDLING STYLE:\n- Never argue or pressure\n- Acknowledge and reframe professionally\n- Use questions to uncover real concerns\n- Maintain premium positioning throughout\n- Build on exclusivity and scarcity\n\nRESPONSE RULES:\n- If objection resolved: Continue to next agent\n- If objection persists: Respectfully exit\n- If not real objection: Route to appropriate agent\n\nReturn JSON: {\"response\": \"your message\", \"objection_type\": \"trust|time|money|authority|need|none\", \"objection_resolved\": true/false, \"next_agent\": \"closing|qualification|exit\", \"confidence_level\": 1-10}"
+            },
+            {
+              "role": "user",
+              "content": "Message: {{ $json.message }}\nProspect: {{ $json.prospect || {} }}\nConversation Context: {{ $json.context || {} }}\nPrevious Objections: {{ $json.previous_objections || [] }}"
+            }
+          ]
+        },
+        "maxTokens": 200,
+        "temperature": 0.4
+      }
+    },
+    {
+      "id": "closing-agent",
+      "name": "🏆 Closing Agent",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.1,
+      "position": [700, 550],
+      "parameters": {
+        "resource": "chat",
+        "operation": "complete",
+        "model": "gpt-4",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are the CLOSING AGENT for APEX Remote Operations - specializing in high-ticket executive program enrollment.\n\nYour mission: Guide qualified prospects to the next step in our exclusive selection process.\n\nCLOSING FRAMEWORK:\n- This is an invitation-only program\n- Next step is exclusive strategy session\n- Limited availability for serious executives\n- We select clients, not just accept applications\n\nNEXT STEPS OPTIONS:\n1. STRATEGY SESSION: 30-minute executive briefing\n2. PROGRAM OVERVIEW: Detailed capabilities presentation\n3. QUALIFICATION CALL: Final assessment conversation\n\nCLOSING PSYCHOLOGY:\n- Create urgency through scarcity\n- Position as exclusive opportunity\n- Use consultative, advisory approach\n- Assume the close (they're already interested)\n- Focus on value and transformation\n\nCONVERSATION STYLE:\n- Confident and authoritative\n- Brief and direct\n- Focus on next action\n- Maintain exclusivity positioning\n- No desperation or pressure\n\nTRANSITION PHRASES:\n- \"Based on our conversation, you'd be a strong fit...\"\n- \"I'd like to invite you to...\"\n- \"The next step for executives like yourself...\"\n- \"Given your background and needs...\"\n\nReturn JSON: {\"response\": \"your message\", \"closing_action\": \"strategy_session|program_overview|qualification_call\", \"urgency_level\": \"high|medium|low\", \"next_steps\": \"string\", \"calendar_link\": \"string|null\"}"
+            },
+            {
+              "role": "user",
+              "content": "Message: {{ $json.message }}\nProspect: {{ $json.prospect || {} }}\nQualification Score: {{ $json.qualification_score || 0 }}\nConversation Summary: {{ $json.conversation_summary || '' }}"
+            }
+          ]
+        },
+        "maxTokens": 200,
+        "temperature": 0.4
+      }
+    },
+    {
+      "id": "response-synthesizer",
+      "name": "Response Synthesizer",
+      "type": "n8n-nodes-base.aiTransform",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "parameters": {
+        "instructions": "Synthesize the agent response into a final chat message. Ensure it maintains the professional, executive-level tone while being conversational and natural. Remove any JSON formatting and return only the message text that should be sent to the prospect."
+      }
+    },
+    {
+      "id": "update-database",
+      "name": "Update Database",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1100, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "{{ $env.SUPABASE_URL }}/rest/v1/conversations",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SUPABASE_ANON_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "apikey",
+              "value": "{{ $env.SUPABASE_ANON_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "jsonBody": "{\n  \"message\": \"{{ $json.message }}\",\n  \"response\": \"{{ $json.response }}\",\n  \"prospect_data\": {{ $json.prospect }},\n  \"agent_used\": \"{{ $json.agent }}\",\n  \"qualification_score\": {{ $json.qualification_score || 0 }},\n  \"conversation_stage\": \"{{ $json.stage }}\",\n  \"created_at\": \"{{ $now }}\"\n}"
+      }
+    },
+    {
+      "id": "final-response",
+      "name": "Final Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1300, 300],
+      "parameters": {
+        "responseBody": "{\n  \"message\": \"{{ $json.response }}\",\n  \"status\": \"success\",\n  \"agent\": \"{{ $json.agent }}\",\n  \"stage\": \"{{ $json.stage }}\"\n}",
+        "responseCode": 200,
+        "responseHeaders": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "webhook-trigger": {
+      "main": [
+        [
+          {
+            "node": "context-analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "context-analyzer": {
+      "main": [
+        [
+          {
+            "node": "agent-router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agent-router": {
+      "main": [
+        [
+          {
+            "node": "gatekeeper-agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "positioning-agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "intelligence-agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "qualification-agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "objection-handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "closing-agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gatekeeper-agent": {
+      "main": [
+        [
+          {
+            "node": "response-synthesizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "positioning-agent": {
+      "main": [
+        [
+          {
+            "node": "response-synthesizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "intelligence-agent": {
+      "main": [
+        [
+          {
+            "node": "response-synthesizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "qualification-agent": {
+      "main": [
+        [
+          {
+            "node": "response-synthesizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "objection-handler": {
+      "main": [
+        [
+          {
+            "node": "response-synthesizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "closing-agent": {
+      "main": [
+        [
+          {
+            "node": "response-synthesizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "response-synthesizer": {
+      "main": [
+        [
+          {
+            "node": "update-database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update-database": {
+      "main": [
+        [
+          {
+            "node": "final-response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "executionTimeout": 30,
+    "timezone": "America/New_York"
+  }
+}

@@ -18,7 +18,7 @@ import Link from 'next/link';
 import { communityConfig } from '@/config/community';
 
 export default async function CommunityPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {

@@ -20,7 +20,7 @@ import { CourseCards } from '@/components/learning-paths/course-cards';
 
 async function getLearningPathWithModules(slug: string) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Get the learning path
     const { data: path, error: pathError } = await supabase

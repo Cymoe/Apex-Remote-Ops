@@ -12,7 +12,7 @@ export async function GET(
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();

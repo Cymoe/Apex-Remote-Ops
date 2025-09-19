@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 export async function createModule(courseId: string, formData: any) {
   try {
     // Check authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -59,7 +59,7 @@ export async function createModule(courseId: string, formData: any) {
 export async function updateModule(moduleId: string, formData: any) {
   try {
     // Check authentication
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {

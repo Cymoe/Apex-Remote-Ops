@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { firstName, lastName, email, territory, amount, product } = body;
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Create purchase record
     const { data: purchase, error } = await supabase

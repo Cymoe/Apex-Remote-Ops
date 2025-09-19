@@ -54,7 +54,7 @@ interface UserProgress {
 }
 
 async function getCourses() {
-  const supabase = createClient();
+  const supabase = await createClient();
   
   // Get all published courses
   const { data: courses, error: coursesError } = await supabase
@@ -218,7 +218,7 @@ export default async function CoursesPage() {
   const courses = await getCourses();
   
   // Get user data for personalization
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   // Calculate overall stats dynamically

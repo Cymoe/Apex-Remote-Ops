@@ -15,7 +15,7 @@ export async function GET() {
       checks.environment = true;
     }
 
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Check database connection
     const { error: dbError } = await supabase

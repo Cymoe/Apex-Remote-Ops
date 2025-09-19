@@ -18,7 +18,7 @@ export default async function TestSupabasePage() {
     const { createClient } = await import('@/lib/supabase/server');
     
     // Try to create client
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Try to get user
     const { data: { user }, error } = await supabase.auth.getUser();

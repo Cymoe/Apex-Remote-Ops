@@ -8,7 +8,7 @@ interface PageProps {
 
 export default async function EditCoursePage({ params }: PageProps) {
   const resolvedParams = await params;
-  const supabase = createClient();
+  const supabase = await createClient();
   
   // Check if user is authenticated
   const { data: { user } } = await supabase.auth.getUser();

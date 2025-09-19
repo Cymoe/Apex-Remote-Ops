@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ArrowRight, Route, BookOpen, Target } from 'lucide-react';
 
 async function getLastViewedModule(userId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   
   // Get the most recently updated progress
   const { data: lastProgress } = await supabase
@@ -31,7 +31,7 @@ async function getLastViewedModule(userId: string) {
 }
 
 async function getFeaturedPath() {
-  const supabase = createClient();
+  const supabase = await createClient();
   
   // Get the shortest learning path (good for beginners)
   const { data: path } = await supabase
@@ -45,7 +45,7 @@ async function getFeaturedPath() {
 }
 
 export default async function DashboardPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   
   const userName = user?.user_metadata?.full_name || user?.email || 'there';

@@ -11,7 +11,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { id: applicationId } = params;
     const body = await req.json();
     const { action, territory, calendarLink, rejectionReason } = body;

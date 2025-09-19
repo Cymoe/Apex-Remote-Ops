@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY || '',
     });
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();

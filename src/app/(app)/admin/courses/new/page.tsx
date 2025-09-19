@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { CourseEditForm } from '@/components/admin/course-edit-form';
 
 export default async function NewCoursePage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   
   // Check if user is authenticated
   const { data: { user } } = await supabase.auth.getUser();

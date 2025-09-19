@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, leadContext } = await req.json();
     const conversationId = req.headers.get('x-conversation-id') || crypto.randomUUID();
-    const supabase = createClient();
+    const supabase = await createClient();
     
     // Get last user message
     const lastUserMessage = messages[messages.length - 1];

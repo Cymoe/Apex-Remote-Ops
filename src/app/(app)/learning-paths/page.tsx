@@ -25,7 +25,7 @@ interface Course {
 }
 
 async function getLearningPaths() {
-  const supabase = createClient();
+  const supabase = await createClient();
   
   // Get all learning paths
   const { data: paths, error } = await supabase

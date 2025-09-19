@@ -16,7 +16,7 @@ import {
   Menu
 } from 'lucide-react';
 import Link from 'next/link';
-import { VideoSection } from '@/components/course/video-section';l
+import { VideoSection } from '@/components/course/video-section';
 import ProgressTracker from '@/components/progress-tracker';
 import { CourseHeader } from '@/components/course/course-header';
 import { EmptyModuleSection } from '@/components/course/empty-module-section';
@@ -32,7 +32,7 @@ interface CourseDetailPageProps {
 }
 
 async function getCourseWithModules(slug: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   
   console.log('Fetching course with slug:', slug);
   
