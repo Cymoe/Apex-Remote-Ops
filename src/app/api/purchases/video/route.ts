@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { firstName, lastName, email, territory, amount, product } = body;
+    const { firstName, lastName, email, amount, product } = body;
 
     const supabase = await createClient();
 
@@ -17,11 +17,13 @@ export async function POST(request: NextRequest) {
         last_name: lastName,
         product_type: 'video',
         amount: amount || 497,
-        territory: territory,
+        territory: null,  // Video purchase doesn't require territory
         status: 'completed', // In production, this would be 'pending' until Stripe confirms
         metadata: {
           product_name: product || '20-minute-blueprint',
-          source: 'landing-page'
+          source: 'landing-page',
+          whatsapp_group_link: process.env.NEXT_PUBLIC_WHATSAPP_GROUP_LINK || 'https://chat.whatsapp.com/',
+          includes_whatsapp_access: true
         }
       })
       .select()
@@ -42,7 +44,10 @@ export async function POST(request: NextRequest) {
         is_video_buyer: true,
         video_purchased_at: new Date().toISOString(),
         upgrade_eligible: true,
-        purchase_type: 'video'
+        purchase_type: 'video',
+        metadata: {
+          whatsapp_group_invited: true
+        }
       })
       .eq('email', email);
 

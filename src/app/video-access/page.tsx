@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ApexLogo } from '@/components/apex-logo';
-import { Play, Download, CheckCircle, ArrowRight, Clock, Users, TrendingUp } from 'lucide-react';
+import { Play, Download, CheckCircle, ArrowRight, Clock, Users, TrendingUp, MessageCircle } from 'lucide-react';
 
 interface PurchaseData {
   firstName: string;
@@ -134,6 +134,49 @@ export default function VideoAccessPage() {
                     <p className="text-xs text-gray-400">PDF - 3.2MB</p>
                   </div>
                 </button>
+              </div>
+            </div>
+
+            {/* WhatsApp Group Section - The Evolution */}
+            <div className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl p-4 sm:p-6 md:p-8 mb-8 border border-gray-700">
+              <h2 className="text-xl sm:text-2xl font-bold mb-4">You Just Skipped Years of Pain</h2>
+              
+              <div className="mb-6 space-y-3 text-gray-300">
+                <p className="text-sm sm:text-base">
+                  Most operators go through 3 brutal phases:
+                </p>
+                <div className="space-y-2 ml-2 sm:ml-4">
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <span className="text-red-500 font-bold text-sm sm:text-base whitespace-nowrap">Phase 1:</span>
+                    <span className="text-sm sm:text-base"><strong>Survival</strong> - Doing everything yourself, barely staying afloat</span>
+                  </div>
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <span className="text-yellow-500 font-bold text-sm sm:text-base whitespace-nowrap">Phase 2:</span>
+                    <span className="text-sm sm:text-base"><strong>Systems</strong> - Finally building repeatable processes</span>
+                  </div>
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <span className="text-green-500 font-bold text-sm sm:text-base whitespace-nowrap">Phase 3:</span>
+                    <span className="text-sm sm:text-base"><strong>Scale</strong> - Putting people into those systems</span>
+                  </div>
+                </div>
+                <p className="text-base sm:text-lg font-semibold mt-4">
+                  You just jumped straight to Phase 3.
+                </p>
+              </div>
+
+              <div className="bg-gray-700/50 rounded-lg p-4 sm:p-6">
+                <h3 className="text-lg sm:text-xl font-bold mb-3 text-amber-500">Join the WhatsApp Group</h3>
+                <p className="text-sm sm:text-base text-gray-300 mb-4">
+                  Connect with others who are building with systems, not struggling to survive.
+                  We discuss AI, automation, hiring, and making money with boring businesses.
+                </p>
+                <Button
+                  onClick={() => window.open(process.env.NEXT_PUBLIC_WHATSAPP_GROUP_LINK || 'https://chat.whatsapp.com/', '_blank')}
+                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-bold px-4 sm:px-6 py-3 text-sm sm:text-base"
+                >
+                  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  Join WhatsApp Group
+                </Button>
               </div>
             </div>
           </div>

@@ -81,24 +81,41 @@ export default function OptimizedHome() {
                 </p>
               </div>
               
+              {/* The Evolution Story */}
+              <div className="bg-yellow-50 border-l-4 border-yellow-600 p-3 sm:p-4 mb-6">
+                <p className="text-sm sm:text-base text-gray-800 font-medium">
+                  <strong className="text-gray-900">Skip the Survival Phase:</strong><br/>
+                  Most people spend 2-3 years just trying to survive, then another 2 years building systems that work.
+                  We've already spent the years and millions building it.
+                  <br/><br/>
+                  <strong className="text-green-700">You get to skip straight to proven systems.</strong>
+                </p>
+              </div>
+
               {/* Value Props - Updated */}
               <ul className="space-y-3 mb-8">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm sm:text-base text-gray-700">
                     <strong>No Tools, No Truck, No Experience:</strong> Just a laptop and phone
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm sm:text-base text-gray-700">
                     <strong>Average Deal Size:</strong> $3,500 (you keep $1,400-$2,100 per job)
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-700">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm sm:text-base text-gray-700">
                     <strong>Work From Anywhere:</strong> Bali, Dubai, Singapore, Miami - manage crews remotely
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm sm:text-base text-gray-700">
+                    <strong>Private WhatsApp Group:</strong> Real operators sharing what works
                   </span>
                 </li>
               </ul>
@@ -133,18 +150,6 @@ export default function OptimizedHome() {
       {/* Video Section - Mobile Optimized */}
       <section className="py-12 md:py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 md:p-3 mb-4 md:mb-6 inline-block">
-            <p className="text-xs md:text-sm font-semibold text-yellow-800">
-              ⚡ WATCH THIS FIRST: See exactly how the system works (12 min)
-            </p>
-          </div>
-          
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6">
-            From Zero to $67K/Month in 8 Months
-          </h2>
-          <p className="text-lg md:text-xl text-gray-700 mb-6 md:mb-8">
-            Marcel had <u>zero construction experience</u>. Watch his story:
-          </p>
           
           {/* Video with play button overlay */}
           <div className="relative aspect-video bg-gray-900 rounded-xl shadow-2xl overflow-hidden group cursor-pointer">
