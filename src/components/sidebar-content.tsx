@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Home, Bot, BookOpen, Users, Settings, Shield, Route, FileText, ExternalLink, LogOut, PlayCircle, Sparkles } from 'lucide-react';
+import { Home, Bot, BookOpen, Users, Settings, Shield, Route, FileText, ExternalLink, LogOut, PlayCircle, Sparkles, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ApexLogo } from '@/components/apex-logo';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -44,6 +44,7 @@ export function SidebarContent({ user }: SidebarContentProps) {
       return [
         { href: '/dashboard', label: 'Home', icon: Home },
         { href: '/courses/blueprint-video', label: 'Your Blueprint', icon: PlayCircle, highlight: true },
+        { href: 'https://wa.me/message/YOUR_WHATSAPP_ID', label: 'WhatsApp Community', icon: MessageCircle, isExternal: true },
         { href: '/upgrade', label: 'Upgrade to Full Access', icon: Sparkles, isPrimary: true },
       ];
     }
@@ -77,6 +78,8 @@ export function SidebarContent({ user }: SidebarContentProps) {
         <nav className="flex flex-col space-y-0.5">
           {navItems.map((item: any) => {
             const isActive = pathname === item.href;
+            const isExternal = item.isExternal || item.href.startsWith('http');
+            
             return (
               <Button 
                 key={item.label} 
@@ -91,10 +94,17 @@ export function SidebarContent({ user }: SidebarContentProps) {
                 )}
                 asChild
               >
-                <Link href={item.href}>
-                  <item.icon className={cn("mr-2 h-4 w-4", isActive && "text-white", item.isPrimary && "text-black")} />
-                  {item.label}
-                </Link>
+                {isExternal ? (
+                  <a href={item.href} target="_blank" rel="noopener noreferrer">
+                    <item.icon className={cn("mr-2 h-4 w-4", isActive && "text-white", item.isPrimary && "text-black")} />
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link href={item.href}>
+                    <item.icon className={cn("mr-2 h-4 w-4", isActive && "text-white", item.isPrimary && "text-black")} />
+                    {item.label}
+                  </Link>
+                )}
               </Button>
             );
           })}
