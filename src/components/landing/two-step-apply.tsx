@@ -204,9 +204,10 @@ export function TwoStepApply() {
 
           <Button
             onClick={handleFullApplication}
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 md:py-4 text-base md:text-lg font-semibold"
+            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-lg"
           >
-            Get Instant Access for $497 →
+            <span className="block sm:hidden">Get Access for $497 →</span>
+            <span className="hidden sm:block">Get Instant Access for $497 →</span>
           </Button>
 
           <p className="text-xs text-gray-500 text-center">

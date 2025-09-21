@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { ApexLogo } from '@/components/apex-logo';
-import { Shield, Lock, Users, TrendingUp, CheckCircle, MapPin, Award, Building2, Star, Trophy, Clock, DollarSign } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 // Import conversion components
@@ -144,7 +144,7 @@ export default function OptimizedHome() {
                 <p className="text-lg font-bold text-gray-800 text-center mb-1">
                   <span className="line-through text-gray-600">Regular Price: $997</span>
                 </p>
-                <p className="text-2xl font-bold text-green-700 text-center mb-3">
+                <p className="text-xl sm:text-2xl font-bold text-green-700 text-center mb-3">
                   Special Price: $497
                 </p>
                 <div className="flex items-center justify-center gap-2">
@@ -172,7 +172,7 @@ export default function OptimizedHome() {
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.5 15.5c0 .55-.45 1-1 1H7.5c-.55 0-1-.45-1-1v-11c0-.55.45-1 1-1h9c.55 0 1 .45 1 1v11z"/>
                 </svg>
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3">
                 Join Our Private WhatsApp Community
               </h2>
               <p className="text-lg text-gray-600">
@@ -212,7 +212,7 @@ export default function OptimizedHome() {
             </div>
             <div>
               <p className="text-sm uppercase tracking-wider text-gray-600 mb-4">FROM THE FOUNDER</p>
-              <h2 className="text-3xl font-bold mb-4">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-4">
                 "I Went From $0 to $1.2M Running Renovation Businesses From My Laptop"
               </h2>
               <p className="text-gray-700 mb-4">
@@ -240,45 +240,53 @@ export default function OptimizedHome() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <p className="text-sm uppercase tracking-wider text-green-600 mb-3">THE OPPORTUNITY</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
               The Projects That Print Money
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
               <strong>You don't do ANY of this work</strong> - you broker it. 
               Crews do the labor, you manage from your laptop. <strong>40-60% profit margins.</strong>
             </p>
           </div>
 
           {/* Featured High-Ticket Services */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
-              <div className="text-3xl mb-3">🚿</div>
-              <h3 className="font-bold text-lg mb-2">Bathroom Remodels</h3>
-              <p className="text-3xl font-bold text-blue-700 mb-1">$8-15K</p>
-              <p className="text-sm text-gray-600">Average project • 2 weeks</p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
+                <div className="mb-4">
+                  <Image src="/bath.png" alt="Bathroom Remodels" width={200} height={120} className="w-full h-20 object-cover rounded-lg" />
+                </div>
+                <h3 className="font-bold text-base sm:text-lg mb-2">Bathroom Remodels</h3>
+                <p className="text-2xl sm:text-3xl font-bold text-blue-700 mb-1">$8-15K</p>
+                <p className="text-sm text-gray-600">Average project • 2 weeks</p>
+              </div>
+              
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border-2 border-green-200">
+                <div className="mb-4">
+                  <Image src="/deckpatio.png" alt="Deck & Patio" width={200} height={120} className="w-full h-20 object-cover rounded-lg" />
+                </div>
+                <h3 className="font-bold text-base sm:text-lg mb-2">Deck & Patio</h3>
+                <p className="text-2xl sm:text-3xl font-bold text-green-700 mb-1">$10-25K</p>
+                <p className="text-sm text-gray-600">Summer rush season</p>
+              </div>
+              
+              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border-2 border-yellow-200">
+                <div className="mb-4">
+                  <Image src="/eco.png" alt="Eco Upgrades" width={200} height={120} className="w-full h-20 object-cover rounded-lg" />
+                </div>
+                <h3 className="font-bold text-base sm:text-lg mb-2">Eco Upgrades</h3>
+                <p className="text-2xl sm:text-3xl font-bold text-yellow-700 mb-1">$5-20K</p>
+                <p className="text-sm text-gray-600">Rebates available</p>
+              </div>
+              
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-purple-200">
+                <div className="mb-4">
+                  <Image src="/biophilic.png" alt="Biophilic Design" width={200} height={120} className="w-full h-20 object-cover rounded-lg" />
+                </div>
+                <h3 className="font-bold text-base sm:text-lg mb-2">Biophilic Design</h3>
+                <p className="text-2xl sm:text-3xl font-bold text-purple-700 mb-1">$15-40K</p>
+                <p className="text-sm text-gray-600">Premium clients</p>
+              </div>
             </div>
-            
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border-2 border-green-200">
-              <div className="text-3xl mb-3">🏡</div>
-              <h3 className="font-bold text-lg mb-2">Deck & Patio</h3>
-              <p className="text-3xl font-bold text-green-700 mb-1">$10-25K</p>
-              <p className="text-sm text-gray-600">Summer rush season</p>
-            </div>
-            
-            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border-2 border-yellow-200">
-              <div className="text-3xl mb-3">♻️</div>
-              <h3 className="font-bold text-lg mb-2">Eco Upgrades</h3>
-              <p className="text-3xl font-bold text-yellow-700 mb-1">$5-20K</p>
-              <p className="text-sm text-gray-600">Rebates available</p>
-            </div>
-            
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-purple-200">
-              <div className="text-3xl mb-3">🌿</div>
-              <h3 className="font-bold text-lg mb-2">Biophilic Design</h3>
-              <p className="text-3xl font-bold text-purple-700 mb-1">$15-40K</p>
-              <p className="text-sm text-gray-600">Premium clients</p>
-            </div>
-          </div>
 
           {/* Additional Services Grid */}
           <div className="bg-gray-50 rounded-xl p-8">
@@ -372,7 +380,7 @@ export default function OptimizedHome() {
           <div className="mt-8 text-center">
             <Button 
               onClick={() => document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' })}
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 text-lg font-bold rounded-lg shadow-lg"
+              className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold rounded-lg shadow-lg"
             >
               Learn How to Broker These Services → $497
             </Button>
@@ -498,7 +506,7 @@ export default function OptimizedHome() {
               </p>
               <Button 
                 onClick={() => document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black px-8 py-4 text-lg font-bold rounded-lg shadow-lg"
+                className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold rounded-lg shadow-lg"
               >
                 Lock In The $497 Price Now →
               </Button>
@@ -512,7 +520,7 @@ export default function OptimizedHome() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8 md:mb-12">
             <p className="text-xs md:text-sm uppercase tracking-wider text-blue-600 mb-3 md:mb-4">REAL RESULTS</p>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">
               Real Success Stories From Our Students
             </h2>
           </div>
@@ -533,10 +541,10 @@ export default function OptimizedHome() {
       <section className="py-16 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">
               What You Get for $497
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600">
               The complete blueprint and community access
             </p>
           </div>
@@ -566,12 +574,12 @@ export default function OptimizedHome() {
             
             <div className="pt-4 border-t-2 border-gray-300">
               <div className="flex items-center justify-between">
-                <p className="text-xl font-bold">Total Value:</p>
-                <p className="text-2xl line-through text-gray-400">$2,485</p>
+                <p className="text-lg sm:text-xl font-bold">Total Value:</p>
+                <p className="text-xl sm:text-2xl line-through text-gray-400">$2,485</p>
               </div>
               <div className="flex items-center justify-between mt-2">
-                <p className="text-xl font-bold text-green-600">Your Investment Today:</p>
-                <p className="text-3xl font-bold text-green-600">$497</p>
+                <p className="text-lg sm:text-xl font-bold text-green-600">Your Investment Today:</p>
+                <p className="text-2xl sm:text-3xl font-bold text-green-600">$497</p>
               </div>
               <p className="text-center text-sm text-gray-600 mt-4">
                 One-time payment - instant access
@@ -581,18 +589,13 @@ export default function OptimizedHome() {
 
           {/* Guarantee Badge */}
           <div className="mt-8 bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 border-2 border-green-300">
-            <div className="flex items-center gap-4">
-              <Shield className="w-16 h-16 text-green-600" />
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  30-Day Money-Back Guarantee
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
+              ✅ 30-Day Money-Back Guarantee
                 </h3>
                 <p className="text-gray-700">
                   Watch the video and implement the strategies for 30 days. 
                   If you don't see a clear path to $10K/month, get a full refund.
                 </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -600,7 +603,7 @@ export default function OptimizedHome() {
       {/* FAQ - Objection Handling */}
       <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold mb-12 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-12 text-center">
             Questions About the 20-Minute Blueprint
           </h2>
           
@@ -649,11 +652,8 @@ export default function OptimizedHome() {
       <section className="py-16 px-4 bg-gradient-to-br from-green-50 to-blue-50">
         <div className="max-w-4xl mx-auto text-center">
           <div className="bg-white rounded-2xl shadow-2xl p-8 md:p-12 border-2 border-green-500">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
-              <Shield className="w-10 h-10 text-green-600" />
-            </div>
             
-            <h2 className="text-3xl font-bold mb-4">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">
               30-Day "Watch It & Profit" Guarantee
             </h2>
             
@@ -698,7 +698,7 @@ export default function OptimizedHome() {
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
               size="lg"
-              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 text-lg font-bold shadow-xl"
+              className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold shadow-xl rounded-lg"
             >
               Get Your Blueprint Risk-Free for $497
             </Button>
@@ -765,19 +765,17 @@ export default function OptimizedHome() {
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
               size="lg"
-              className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-12 py-6 text-xl font-bold shadow-2xl"
+              className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 sm:px-8 md:px-12 py-4 sm:py-5 md:py-6 text-base sm:text-lg md:text-xl font-bold shadow-2xl rounded-lg"
             >
               Get Instant Access for $497 →
             </Button>
             
             <div className="mt-6 flex items-center justify-center gap-6 text-sm text-gray-300">
-              <span className="flex items-center gap-1">
-                <Lock className="w-4 h-4" />
-                SSL Secure
+              <span>
+                🔒 SSL Secure
               </span>
-              <span className="flex items-center gap-1">
-                <Shield className="w-4 h-4" />
-                30-Day Guarantee
+              <span>
+                ✅ 30-Day Guarantee
               </span>
               <span className="flex items-center gap-1">
                 <CheckCircle className="w-4 h-4" />
@@ -801,7 +799,7 @@ export default function OptimizedHome() {
               const element = document.querySelector('#apply-form');
               element?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 font-bold"
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 text-sm sm:text-base font-bold rounded-lg"
           >
             Get Your Blueprint - Only $497
           </Button>
