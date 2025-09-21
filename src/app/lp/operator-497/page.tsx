@@ -173,7 +173,7 @@ export default function OptimizedHome() {
                 </svg>
               </div>
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3">
-                  Join Our Community of Killers
+                  Join Our Community of Winners
                 </h2>
               <p className="text-lg text-gray-600">
                 Connect with operators building remote service businesses
@@ -250,41 +250,41 @@ export default function OptimizedHome() {
           </div>
 
           {/* Featured High-Ticket Services */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
-                <div className="mb-4">
-                  <Image src="/bath.png" alt="Bathroom Remodels" width={200} height={120} className="w-full h-20 object-cover rounded-lg" />
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-3 sm:p-4 md:p-6 border-2 border-blue-200">
+                <div className="mb-2 sm:mb-3 relative aspect-video w-full overflow-hidden rounded-lg">
+                  <Image src="/bath.png" alt="Bathroom Remodels" fill className="object-cover" />
                 </div>
-                <h3 className="font-bold text-base sm:text-lg mb-2">Bathroom Remodels</h3>
-                <p className="text-2xl sm:text-3xl font-bold text-blue-700 mb-1">$8-15K</p>
-                <p className="text-sm text-gray-600">Average project • 2 weeks</p>
+                <h3 className="font-bold text-sm sm:text-base lg:text-lg mb-1 sm:mb-2">Bathroom Remodels</h3>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700 mb-0.5 sm:mb-1">$8-15K</p>
+                <p className="text-xs sm:text-sm text-gray-600">Average project</p>
               </div>
               
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border-2 border-green-200">
-                <div className="mb-4">
-                  <Image src="/deckpatio.png" alt="Deck & Patio" width={200} height={120} className="w-full h-20 object-cover rounded-lg" />
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-3 sm:p-4 md:p-6 border-2 border-green-200">
+                <div className="mb-2 sm:mb-3 relative aspect-video w-full overflow-hidden rounded-lg">
+                  <Image src="/deckpatio.png" alt="Deck & Patio" fill className="object-cover" />
                 </div>
-                <h3 className="font-bold text-base sm:text-lg mb-2">Deck & Patio</h3>
-                <p className="text-2xl sm:text-3xl font-bold text-green-700 mb-1">$10-25K</p>
-                <p className="text-sm text-gray-600">Summer rush season</p>
+                <h3 className="font-bold text-sm sm:text-base lg:text-lg mb-1 sm:mb-2">Deck & Patio</h3>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-700 mb-0.5 sm:mb-1">$10-25K</p>
+                <p className="text-xs sm:text-sm text-gray-600">Summer rush</p>
               </div>
               
-              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border-2 border-yellow-200">
-                <div className="mb-4">
-                  <Image src="/eco.png" alt="Eco Upgrades" width={200} height={120} className="w-full h-20 object-cover rounded-lg" />
+              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-3 sm:p-4 md:p-6 border-2 border-yellow-200">
+                <div className="mb-2 sm:mb-3 relative aspect-video w-full overflow-hidden rounded-lg">
+                  <Image src="/eco.png" alt="Eco Upgrades" fill className="object-cover" />
                 </div>
-                <h3 className="font-bold text-base sm:text-lg mb-2">Eco Upgrades</h3>
-                <p className="text-2xl sm:text-3xl font-bold text-yellow-700 mb-1">$5-20K</p>
-                <p className="text-sm text-gray-600">Rebates available</p>
+                <h3 className="font-bold text-sm sm:text-base lg:text-lg mb-1 sm:mb-2">Eco Upgrades</h3>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-700 mb-0.5 sm:mb-1">$5-20K</p>
+                <p className="text-xs sm:text-sm text-gray-600">Rebates available</p>
               </div>
               
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-purple-200">
-                <div className="mb-4">
-                  <Image src="/biophilic.png" alt="Biophilic Design" width={200} height={120} className="w-full h-20 object-cover rounded-lg" />
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-3 sm:p-4 md:p-6 border-2 border-purple-200">
+                <div className="mb-2 sm:mb-3 relative aspect-video w-full overflow-hidden rounded-lg">
+                  <Image src="/biophilic.png" alt="Biophilic Design" fill className="object-cover" />
                 </div>
-                <h3 className="font-bold text-base sm:text-lg mb-2">Biophilic Design</h3>
-                <p className="text-2xl sm:text-3xl font-bold text-purple-700 mb-1">$15-40K</p>
-                <p className="text-sm text-gray-600">Premium clients</p>
+                <h3 className="font-bold text-sm sm:text-base lg:text-lg mb-1 sm:mb-2">Biophilic Design</h3>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-700 mb-0.5 sm:mb-1">$15-40K</p>
+                <p className="text-xs sm:text-sm text-gray-600">Premium clients</p>
               </div>
             </div>
 
@@ -506,9 +506,10 @@ export default function OptimizedHome() {
               </p>
               <Button 
                 onClick={() => document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' })}
-                className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold rounded-lg shadow-lg"
+                className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-sm sm:text-base md:text-lg font-bold rounded-lg shadow-lg whitespace-nowrap"
               >
-                Lock In The $497 Price Now →
+                <span className="block sm:hidden">Get $497 Price →</span>
+                <span className="hidden sm:block">Lock In The $497 Price Now →</span>
               </Button>
             </div>
           </div>
@@ -698,9 +699,10 @@ export default function OptimizedHome() {
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
               size="lg"
-              className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold shadow-xl rounded-lg"
+              className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-sm sm:text-base md:text-lg font-bold shadow-xl rounded-lg"
             >
-              Get Your Blueprint Risk-Free for $497
+              <span className="block sm:hidden">Get Blueprint - $497</span>
+              <span className="hidden sm:block">Get Your Blueprint Risk-Free for $497</span>
             </Button>
             
             <p className="text-sm text-gray-500 mt-4">
@@ -727,9 +729,10 @@ export default function OptimizedHome() {
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
               size="lg"
-              className="bg-white hover:bg-gray-100 text-blue-700 px-8 py-4 text-lg font-bold shadow-xl transition-all transform hover:scale-105"
+              className="w-full sm:w-auto bg-white hover:bg-gray-100 text-blue-700 px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-sm sm:text-base md:text-lg font-bold shadow-xl transition-all transform hover:scale-105 rounded-lg"
             >
-              Get Instant Access for $497 →
+              <span className="block sm:hidden">Get Access - $497</span>
+              <span className="hidden sm:block">Get Instant Access for $497 →</span>
             </Button>
             <p className="text-sm mt-4 opacity-90">
               Only 13 spots left at $497 (returns to $997 after)
@@ -765,9 +768,10 @@ export default function OptimizedHome() {
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
               size="lg"
-              className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 sm:px-8 md:px-12 py-4 sm:py-5 md:py-6 text-base sm:text-lg md:text-xl font-bold shadow-2xl rounded-lg"
+              className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 sm:px-8 md:px-12 py-4 sm:py-5 md:py-6 text-sm sm:text-base md:text-lg lg:text-xl font-bold shadow-2xl rounded-lg"
             >
-              Get Instant Access for $497 →
+              <span className="block sm:hidden">Get Access for $497 →</span>
+              <span className="hidden sm:block">Get Instant Access for $497 →</span>
             </Button>
             
             <div className="mt-6 flex items-center justify-center gap-6 text-sm text-gray-300">
@@ -801,7 +805,7 @@ export default function OptimizedHome() {
             }}
             className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 text-sm sm:text-base font-bold rounded-lg"
           >
-            Get Your Blueprint - Only $497
+            Get Blueprint - $497
           </Button>
         </div>
       )}
