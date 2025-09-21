@@ -87,10 +87,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // NOTE: Not sending nurture emails through Resend
-    // Resend is for transactional emails only (purchase confirmations, etc)
-    // For nurture/marketing emails, use a proper email marketing service
-    console.log('Lead saved. Not sending nurture email (Resend is for transactional only)');
+    // Add to Beehiiv for nurture sequences
+    console.log('Adding lead to Beehiiv for nurture sequences...');
+    try {
+      const { beehiiv } = await import('@/lib/beehiiv/client');
+      const beehiivResult = await beehiiv.addSubscriber({
+        email,
+        utm_source: source || 'website',
+        utm_medium: 'lead_capture',
+        utm_campaign: 'blueprint_video',
+        custom_fields: {
+          first_name: metadata?.firstName || '',
+          source: source,
+        }
+      });
+      console.log('Beehiiv result:', beehiivResult);
+    } catch (beehiivError) {
+      console.error('Failed to add to Beehiiv:', beehiivError);
+      // Don't fail the request if Beehiiv fails
+    }
 
     return NextResponse.json({
       success: true,

@@ -191,6 +191,17 @@ export async function GET(request: NextRequest) {
       console.error('Error recording purchase:', purchaseError);
     }
     
+    // Tag in Beehiiv as customer
+    console.log('Tagging subscriber in Beehiiv as customer...');
+    try {
+      const { beehiiv } = await import('@/lib/beehiiv/client');
+      const tagResult = await beehiiv.tagSubscriber(email, ['blueprint-buyer', 'customer']);
+      console.log('Beehiiv tag result:', tagResult);
+    } catch (beehiivError) {
+      console.error('Failed to tag in Beehiiv:', beehiivError);
+      // Don't fail the purchase if Beehiiv fails
+    }
+    
     // Send appropriate email
     console.log('About to send email to:', email, 'isNewUser:', isNewUser);
     console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
