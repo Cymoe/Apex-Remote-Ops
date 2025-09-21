@@ -7,20 +7,88 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const sessionId = searchParams.get('session_id');
   
-  // For now, get email from localStorage data (saved during checkout)
-  // In production, you'd retrieve this from Stripe using the session_id
+  // Try to get email from URL params first (if passed)
   let email = searchParams.get('email');
   
-  // If no email in URL, try to get from a default test email
-  // In production, you would fetch this from Stripe API using session_id
-  if (!email && sessionId) {
-    // For testing, use a hardcoded email or retrieve from Stripe
-    // You'll need to implement Stripe webhook or API call here
-    email = '2mylescameron@gmail.com'; // Temporary for testing
-  }
-  
+  // If no email in URL, we need to get it from the stored data
+  // Since we stored it in localStorage before redirect, we'll use a client-side page
+  // to retrieve it and pass it back
   if (!email) {
-    return NextResponse.redirect(new URL('/auth/sign-in?success=payment_complete', request.url));
+    // Return a client-side page that reads localStorage and redirects with email
+    return new NextResponse(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Completing Your Purchase...</title>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+              margin: 0;
+              background: #000;
+              color: white;
+            }
+            .container {
+              text-align: center;
+            }
+            .spinner {
+              width: 50px;
+              height: 50px;
+              margin: 0 auto 20px;
+              border: 3px solid rgba(255,255,255,0.1);
+              border-top-color: #3b82f6;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+            h1 {
+              font-size: 1.5rem;
+              margin-bottom: 0.5rem;
+            }
+            p {
+              color: #9ca3af;
+            }
+          </style>
+          <script>
+            // Get the stored email from localStorage
+            const videoBuyerData = localStorage.getItem('videoBuyerData');
+            if (videoBuyerData) {
+              const data = JSON.parse(videoBuyerData);
+              const email = data.email;
+              if (email) {
+                // Redirect with the email in the URL
+                window.location.href = '/checkout/success?email=' + encodeURIComponent(email);
+              } else {
+                // No email stored, redirect to sign-in
+                window.location.href = '/auth/sign-in?success=payment_complete';
+              }
+            } else {
+              // No data stored, redirect to sign-in
+              window.location.href = '/auth/sign-in?success=payment_complete';
+            }
+          </script>
+        </head>
+        <body>
+          <div class="container">
+            <div class="spinner"></div>
+            <h1>Setting up your account...</h1>
+            <p>Please wait while we prepare your Blueprint access</p>
+          </div>
+        </body>
+      </html>
+    `, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html',
+      },
+    });
   }
 
   try {
@@ -28,12 +96,13 @@ export async function GET(request: NextRequest) {
     const adminSupabase = await createAdminClient();
     
     // Check if user already exists
-    const { data: existingUser } = await adminSupabase.auth.admin.getUserByEmail(email);
+    const { data: existingUsers } = await adminSupabase.auth.admin.listUsers();
+    const existingUser = existingUsers?.users?.find(u => u.email === email);
     
     let userId: string;
     let isNewUser = false;
     
-    if (!existingUser?.user) {
+    if (!existingUser) {
       // Create new user account for video buyer
       const { data: newUser, error: createError } = await adminSupabase.auth.admin.createUser({
         email,
@@ -51,7 +120,7 @@ export async function GET(request: NextRequest) {
       userId = newUser.user.id;
       isNewUser = true;
     } else {
-      userId = existingUser.user.id;
+      userId = existingUser.id;
     }
     
     // Record the purchase
@@ -87,25 +156,34 @@ export async function GET(request: NextRequest) {
       type: 'magiclink',
       email,
       options: {
-        redirectTo: `${request.nextUrl.origin}/courses/blueprint-video`,
+        redirectTo: `${request.nextUrl.origin}/dashboard`,
       }
     });
     
-    if (magicLink && !magicLinkError) {
+    console.log('Magic link generation:', { magicLink, magicLinkError });
+    
+    if (magicLink && !magicLinkError && magicLink.properties?.action_link) {
       // Extract the token from the magic link and redirect through auth callback
-      // This will automatically sign them in and take them to their Blueprint
+      // This will automatically sign them in and take them to the dashboard
       const url = new URL(magicLink.properties.action_link);
       const token = url.searchParams.get('token');
       const type = url.searchParams.get('type');
       
+      console.log('Magic link tokens:', { token, type, actionLink: magicLink.properties.action_link });
+      
       if (token && type) {
         // Redirect through auth callback to sign them in automatically
-        return NextResponse.redirect(
-          new URL(`/auth/callback?token=${token}&type=${type}&next=/courses/blueprint-video`, request.url)
-        );
+        const callbackUrl = new URL(`/auth/callback`, request.url);
+        callbackUrl.searchParams.set('token', token);
+        callbackUrl.searchParams.set('type', type);
+        callbackUrl.searchParams.set('next', '/dashboard');
+        
+        console.log('Redirecting to:', callbackUrl.toString());
+        return NextResponse.redirect(callbackUrl);
       }
     }
     
+    console.log('Magic link failed, falling back to sign-in');
     // Fallback: If magic link generation fails, redirect to sign-in
     return NextResponse.redirect(
       new URL(`/auth/sign-in?success=video_purchased&email=${encodeURIComponent(email)}`, request.url)

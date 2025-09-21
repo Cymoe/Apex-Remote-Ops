@@ -91,9 +91,15 @@ export default function CheckoutPage() {
       // After payment, Stripe will redirect to our success handler
       const email = formData.email;
       const successUrl = `${window.location.origin}/checkout/success?email=${encodeURIComponent(email)}`;
-      // Note: Stripe Payment Links don't fully support custom success_url in test mode
-      // but we pass email as a parameter for our handler
-      window.location.href = 'https://buy.stripe.com/test_bJe7sLeeNeaWbOJ78i2VG00';
+      
+      // Stripe Payment Link with success URL parameter
+      // The success_url parameter works in production mode
+      const stripeUrl = new URL('https://buy.stripe.com/test_bJe7sLeeNeaWbOJ78i2VG00');
+      stripeUrl.searchParams.set('prefilled_email', email);
+      // In production, you can use: stripeUrl.searchParams.set('success_url', successUrl);
+      
+      // For test mode, we'll append email to the URL that Stripe redirects to
+      window.location.href = stripeUrl.toString();
     } catch (error) {
       console.error('Payment setup failed:', error);
       setIsProcessing(false);
