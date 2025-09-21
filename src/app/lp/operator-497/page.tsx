@@ -172,9 +172,9 @@ export default function OptimizedHome() {
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.5 15.5c0 .55-.45 1-1 1H7.5c-.55 0-1-.45-1-1v-11c0-.55.45-1 1-1h9c.55 0 1 .45 1 1v11z"/>
                 </svg>
               </div>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3">
-                Join Our Private WhatsApp Community
-              </h2>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3">
+                  Join Our Community of Killers
+                </h2>
               <p className="text-lg text-gray-600">
                 Connect with operators building remote service businesses
               </p>
