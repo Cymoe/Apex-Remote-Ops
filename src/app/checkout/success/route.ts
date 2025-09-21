@@ -184,17 +184,31 @@ export async function GET(request: NextRequest) {
     
     // Send appropriate email
     console.log('About to send email to:', email, 'isNewUser:', isNewUser);
+    console.log('RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
+    console.log('RESEND_API_KEY preview:', process.env.RESEND_API_KEY?.substring(0, 15) + '...');
     
-    if (isNewUser) {
-      // Send email with sign-in instructions
-      console.log('Sending welcome email to new video buyer:', email);
-      const emailResult = await sendWelcomeEmailToVideoBuyer(email);
-      console.log('Welcome email result:', emailResult);
-    } else {
-      // Send purchase confirmation only
-      console.log('Sending purchase email to existing user:', email);
-      const emailResult = await sendVideoPurchaseEmail(email);
-      console.log('Purchase email result:', emailResult);
+    let emailResult: any;
+    
+    try {
+      if (isNewUser) {
+        // Send email with sign-in instructions
+        console.log('Sending welcome email to new video buyer:', email);
+        emailResult = await sendWelcomeEmailToVideoBuyer(email);
+        console.log('Welcome email result:', emailResult);
+      } else {
+        // Send purchase confirmation only
+        console.log('Sending purchase email to existing user:', email);
+        emailResult = await sendVideoPurchaseEmail(email);
+        console.log('Purchase email result:', emailResult);
+      }
+      
+      if (!emailResult?.success) {
+        console.error('Email send failed with result:', emailResult);
+      }
+    } catch (emailError: any) {
+      console.error('Email sending threw an error:', emailError);
+      console.error('Error stack:', emailError?.stack);
+      // Don't throw - let the user still get redirected even if email fails
     }
     
     // Instead of magic link, let's just create a session directly

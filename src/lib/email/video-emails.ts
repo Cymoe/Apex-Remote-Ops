@@ -2,9 +2,8 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Use onboarding@resend.dev for testing if domain not verified
-// Change to 'Myles from Remote Ops <myles@remoteops.ai>' once domain is verified in Resend
-const FROM_EMAIL = 'Myles from Remote Ops <onboarding@resend.dev>';
+// Using verified domain for production emails
+const FROM_EMAIL = 'Myles from Remote Ops <myles@remoteops.ai>';
 const SUPPORT_EMAIL = 'support@remoteops.ai';
 
 interface VideoEmailData {
