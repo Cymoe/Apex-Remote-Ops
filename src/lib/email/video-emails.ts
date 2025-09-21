@@ -221,7 +221,7 @@ export async function sendVideoPurchaseEmail(email: string) {
                 This video contains EVERYTHING. Watch it with a notebook ready:
               </p>
               <div style="text-align: center;">
-                <a href="${videoLink}" style="display: inline-block; background: #22c55e; color: white; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-weight: bold;">
+                <a href="${videoUrl}" style="display: inline-block; background: #22c55e; color: white; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-weight: bold;">
                   Watch The Blueprint Now →
                 </a>
               </div>
