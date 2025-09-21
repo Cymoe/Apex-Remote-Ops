@@ -107,14 +107,17 @@ export class BeehiivClient {
       }
 
       const searchResult = await searchResponse.json();
+      console.log('Search result for', email, ':', JSON.stringify(searchResult, null, 2));
       const subscriber = searchResult.data?.[0];
       
       if (!subscriber) {
         console.error('Subscriber not found in Beehiiv:', email);
+        console.error('Full search result:', searchResult);
         return { success: false, error: 'Subscriber not found' };
       }
 
       // Now update the subscriber with tags
+      console.log('Updating subscriber with tags:', subscriber.id, tags);
       const updateResponse = await fetch(
         `${this.baseUrl}/publications/${this.publicationId}/subscriptions/${subscriber.id}`,
         {
@@ -128,6 +131,8 @@ export class BeehiivClient {
           }),
         }
       );
+      
+      console.log('Update response status:', updateResponse.status);
 
       if (!updateResponse.ok) {
         const error = await updateResponse.text();
