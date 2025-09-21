@@ -84,18 +84,18 @@ export function ExitIntentPopup({ onSubmit }: ExitIntentPopupProps) {
 
         <div className="p-8">
           {/* Urgency Banner */}
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6">
-            <p className="text-sm text-red-800 font-medium text-center">
-              🔥 Special Offer Expires in 23:59:47
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-6">
+            <p className="text-sm text-yellow-800 font-medium text-center">
+              ⚠️ Only a few spots remaining at $497
             </p>
           </div>
 
           <div className="text-center mb-6">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-              Wait! Save 50% RIGHT NOW
+              Wait! Don't Miss This
             </h2>
             <p className="text-lg text-gray-600">
-              Get the <span className="font-semibold">20-Minute Blueprint</span> for just $247 (50% OFF the $497 price)
+              Get the <span className="font-semibold">20-Minute Blueprint</span> that shows you everything
             </p>
           </div>
 
@@ -107,7 +107,7 @@ export function ExitIntentPopup({ onSubmit }: ExitIntentPopupProps) {
             </li>
             <li className="flex items-center gap-2 text-sm text-gray-700">
               <span className="text-green-500">✓</span>
-              Save $250 if you act now
+              WhatsApp community access included
             </li>
             <li className="flex items-center gap-2 text-sm text-gray-700">
               <span className="text-green-500">✓</span>
@@ -129,7 +129,7 @@ export function ExitIntentPopup({ onSubmit }: ExitIntentPopupProps) {
               type="submit"
               className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 text-lg font-semibold"
             >
-              Claim 50% OFF - Only $247 →
+              Get Instant Access - $497 →
             </Button>
           </form>
 

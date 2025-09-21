@@ -17,6 +17,7 @@ import { TwitterTestimonialsGrid } from '@/components/landing/twitter-testimonia
 export default function OptimizedHome() {
   const router = useRouter();
   const [showGuarantee, setShowGuarantee] = useState(false);
+  const [spotsLeft, setSpotsLeft] = useState(13);
   
   // Track scroll for sticky CTA
   const [showStickyBar, setShowStickyBar] = useState(false);
@@ -30,11 +31,48 @@ export default function OptimizedHome() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    // Dynamic spots counter - same logic as checkout page
+    const lastVisit = localStorage.getItem('landingLastVisit');
+    const savedSpots = localStorage.getItem('spotsRemaining');
+    const now = Date.now();
+    
+    if (lastVisit && savedSpots) {
+      const hoursSinceLastVisit = (now - parseInt(lastVisit)) / (1000 * 60 * 60);
+      const previousSpots = parseInt(savedSpots);
+      
+      // Decrease spots based on time passed
+      const spotsGone = Math.floor(hoursSinceLastVisit / (2 + Math.random()));
+      const newSpots = Math.max(3, previousSpots - spotsGone);
+      
+      setSpotsLeft(newSpots);
+    } else {
+      // First visit - start with 11-13 spots
+      const initialSpots = 11 + Math.floor(Math.random() * 3);
+      setSpotsLeft(initialSpots);
+    }
+    
+    // Save current visit time
+    localStorage.setItem('landingLastVisit', now.toString());
+    localStorage.setItem('spotsRemaining', spotsLeft.toString());
+
+    // Real-time decrease while on page (every 3-7 minutes)
+    const interval = setInterval(() => {
+      setSpotsLeft(prev => {
+        const newSpots = Math.max(3, prev - 1);
+        localStorage.setItem('spotsRemaining', newSpots.toString());
+        return newSpots;
+      });
+    }, (180 + Math.random() * 240) * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleEmailCapture = (email: string) => {
-    // Send to email service
-    console.log('Email captured:', email);
-    // Redirect to application
-    router.push('/apply?from=video');
+    // Save email to localStorage for checkout page
+    localStorage.setItem('applicationData', JSON.stringify({ email }));
+    // Redirect to checkout
+    router.push('/checkout');
   };
 
   return (
@@ -44,12 +82,12 @@ export default function OptimizedHome() {
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <ApexLogo size="sm" className="md:hidden [&_div]:from-black [&_div]:to-gray-800" />
           <ApexLogo size="md" className="hidden md:block [&_div]:from-black [&_div]:to-gray-800" />
-          <Link 
-            href="/auth/sign-in" 
+            <Link 
+              href="/auth/sign-in" 
             className="text-xs md:text-sm font-medium text-gray-600 hover:text-black transition-colors"
-          >
+            >
             Login
-          </Link>
+            </Link>
         </div>
       </header>
 
@@ -58,23 +96,23 @@ export default function OptimizedHome() {
       <section className="py-8 md:py-12 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-start">
-            {/* Left Column - Copy */}
-            <div>
+            {/* Left Column - Copy (shown second on mobile, first on desktop) */}
+            <div className="order-2 lg:order-1">
               
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight">
+              <h1 className="hidden lg:block text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight">
                 Build a <span className="text-blue-600">$30K/Month</span><br />
                 Remote Home Service Business<br />
                 <span className="text-gray-600 font-normal text-base sm:text-lg md:text-xl">
                   (In One 20-Minute Video)
                 </span>
-              </h1>
+            </h1>
               
               {/* The killer value prop - THE BANGER */}
               <div className="bg-blue-50 border-l-4 border-blue-600 p-4 mb-6">
                 <p className="text-gray-800 font-medium text-lg">
                   <strong className="text-blue-900">The Business Model:</strong><br/>
-                  Be the broker. Hire crews for painting, flooring, concrete, or remodeling jobs. 
-                  You handle sales. They do the work. You keep 40-60% profit.
+              Be the broker. Hire crews for painting, flooring, concrete, or remodeling jobs. 
+              You handle sales. They do the work. You keep 40-60% profit.
                   <br/><br/>
                   <strong className="text-green-700">I'll show you EXACTLY how in 20 minutes flat.</strong>
                 </p>
@@ -122,12 +160,20 @@ export default function OptimizedHome() {
 
             </div>
 
-            {/* Right Column - Video + Form */}
-            <div className="space-y-6">
+            {/* Right Column - Video + Form (shown first on mobile, second on desktop) */}
+            <div className="order-1 lg:order-2 space-y-6">
+              {/* Mobile-only headline */}
+              <h1 className="text-2xl font-bold lg:hidden leading-tight">
+                Build a <span className="text-blue-600">$30K/Month</span> Remote Home Service Business
+                <span className="block text-gray-600 font-normal text-base mt-2">
+                  (In One 20-Minute Video)
+                </span>
+              </h1>
+              
               {/* Video */}
               <div className="relative aspect-video bg-gray-900 rounded-xl shadow-2xl overflow-hidden">
                 <iframe
-                  src="https://www.loom.com/embed/c954a298a53c45dfb558460b77a79552?autoplay=1"
+                  src="https://www.loom.com/embed/c954a298a53c45dfb558460b77a79552?playback_speed=1&speed=1.0&autoplay=false&hide_owner=true&hide_share=true&hide_title=true&hideEmbedTopBar=true"
                   className="absolute inset-0 w-full h-full"
                   style={{ border: '0' }}
                   allowFullScreen
@@ -140,17 +186,17 @@ export default function OptimizedHome() {
               </div>
               
               {/* Pricing Box */}
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-                <p className="text-lg font-bold text-gray-800 text-center mb-1">
-                  <span className="line-through text-gray-600">Regular Price: $997</span>
+              <div className="bg-black border-2 border-gray-700 rounded-lg p-4">
+                <p className="text-lg font-bold text-gray-400 text-center mb-1">
+                  <span className="line-through">$997</span>
                 </p>
-                <p className="text-xl sm:text-2xl font-bold text-green-700 text-center mb-3">
-                  Special Price: $497
+                <p className="text-xl sm:text-2xl font-bold text-green-400 text-center mb-3">
+                  Today: $497
                 </p>
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                  <p className="text-sm font-semibold text-red-800">
-                    ⚠️ Only 13 spots left at this price
+                  <p className="text-sm font-semibold text-yellow-400">
+                    ⚠️ Only {spotsLeft} spots remaining
                   </p>
                 </div>
               </div>
@@ -202,34 +248,34 @@ export default function OptimizedHome() {
         <div className="max-w-4xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
-              <Image
-                src="/myles.jpg"
+                <Image 
+                  src="/myles.jpg" 
                 alt="Myles Webb, Remote Operations"
-                width={400}
-                height={500}
+                  width={400} 
+                  height={500} 
                 className="rounded-lg shadow-xl grayscale scale-110"
-              />
+                />
             </div>
             <div>
               <p className="text-sm uppercase tracking-wider text-gray-600 mb-4">FROM THE FOUNDER</p>
               <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-                "I Went From $0 to $1.2M Running Renovation Businesses From My Laptop"
+                  "I Went From $0 to $1.2M Running Renovation Businesses From My Laptop"
               </h2>
-              <p className="text-gray-700 mb-4">
+                <p className="text-gray-700 mb-4">
                 Hey, I'm Myles. Five years ago, I was stuck in the same trap you're in now. Trading time for money, watching my income plateau, knowing there had to be something better.
-              </p>
-              <p className="text-gray-700 mb-4">
+                </p>
+                <p className="text-gray-700 mb-4">
                 Then I discovered something counterintuitive: While everyone was chasing tech startups and crypto, the real money was hiding in "boring" businesses nobody wanted to talk about. Renovation. Flooring. Painting. The unsexy stuff that actually pays.
-              </p>
-              <p className="text-gray-700 mb-4">
+                </p>
+                <p className="text-gray-700 mb-4">
                 Today, I run multiple six-figure renovation businesses from anywhere—Bali, Miami, Portugal—using just my phone and laptop. No tools, no trucks, no on-site visits. Just smart systems and the right approach.
-              </p>
+                </p>
               <p className="text-lg font-semibold text-gray-900 mb-4">
                 I've condensed everything into the 20-minute video above. Watch it, then decide if you're ready to build something real.
-              </p>
+                </p>
               <p className="italic text-gray-600">
-                — Myles Webb, Remote Operations
-              </p>
+                  — Myles Webb, Remote Operations
+                </p>
             </div>
           </div>
         </div>
@@ -249,66 +295,33 @@ export default function OptimizedHome() {
             </p>
           </div>
 
-          {/* Featured High-Ticket Services */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-3 sm:p-4 md:p-6 border-2 border-blue-200">
-                <div className="mb-2 sm:mb-3 relative aspect-video w-full overflow-hidden rounded-lg">
-                  <Image src="/bath.png" alt="Bathroom Remodels" fill className="object-cover" />
-                </div>
-                <h3 className="font-bold text-sm sm:text-base lg:text-lg mb-1 sm:mb-2">Bathroom Remodels</h3>
-                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-700 mb-0.5 sm:mb-1">$8-15K</p>
-                <p className="text-xs sm:text-sm text-gray-600">Average project</p>
-              </div>
-              
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-3 sm:p-4 md:p-6 border-2 border-green-200">
-                <div className="mb-2 sm:mb-3 relative aspect-video w-full overflow-hidden rounded-lg">
-                  <Image src="/deckpatio.png" alt="Deck & Patio" fill className="object-cover" />
-                </div>
-                <h3 className="font-bold text-sm sm:text-base lg:text-lg mb-1 sm:mb-2">Deck & Patio</h3>
-                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-700 mb-0.5 sm:mb-1">$10-25K</p>
-                <p className="text-xs sm:text-sm text-gray-600">Summer rush</p>
-              </div>
-              
-              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-3 sm:p-4 md:p-6 border-2 border-yellow-200">
-                <div className="mb-2 sm:mb-3 relative aspect-video w-full overflow-hidden rounded-lg">
-                  <Image src="/eco.png" alt="Eco Upgrades" fill className="object-cover" />
-                </div>
-                <h3 className="font-bold text-sm sm:text-base lg:text-lg mb-1 sm:mb-2">Eco Upgrades</h3>
-                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-yellow-700 mb-0.5 sm:mb-1">$5-20K</p>
-                <p className="text-xs sm:text-sm text-gray-600">Rebates available</p>
-              </div>
-              
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-3 sm:p-4 md:p-6 border-2 border-purple-200">
-                <div className="mb-2 sm:mb-3 relative aspect-video w-full overflow-hidden rounded-lg">
-                  <Image src="/biophilic.png" alt="Biophilic Design" fill className="object-cover" />
-                </div>
-                <h3 className="font-bold text-sm sm:text-base lg:text-lg mb-1 sm:mb-2">Biophilic Design</h3>
-                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-700 mb-0.5 sm:mb-1">$15-40K</p>
-                <p className="text-xs sm:text-sm text-gray-600">Premium clients</p>
-              </div>
-            </div>
 
           {/* Additional Services Grid */}
           <div className="bg-gray-50 rounded-xl p-8">
             <h3 className="font-bold text-lg mb-6 text-center">
               Plus These High-Margin Services You Can Broker:
             </h3>
-            <div className="grid md:grid-cols-3 gap-4 text-sm">
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Garage floor coating
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 text-xs sm:text-sm">
+              <ul className="space-y-1 md:space-y-2">
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Garage floor coating</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Outdoor hardscaping
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Outdoor hardscaping</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Sauna/cold plunge install
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Sauna/cold plunge install</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Landscape lighting
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Landscape lighting</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Emergency restoration
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Emergency restoration</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-green-500">✓</span> Exterior brick painting
@@ -318,21 +331,26 @@ export default function OptimizedHome() {
                 </li>
               </ul>
               
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Sports courts
+              <ul className="space-y-1 md:space-y-2">
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Sports courts</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Premium playgrounds
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Premium playgrounds</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Custom closet systems
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Custom closet systems</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Excavation projects
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Excavation projects</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Senior retrofitting
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Senior retrofitting</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-green-500">✓</span> Commercial construction
@@ -342,27 +360,34 @@ export default function OptimizedHome() {
                 </li>
               </ul>
               
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Paving & asphalt
+              <ul className="space-y-1 md:space-y-2 col-start-1 md:col-start-3">
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Paving & asphalt</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Pet waste removal
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Pet waste removal</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Garage door install
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Garage door install</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Insulation services
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Insulation services</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Glass installation
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Glass installation</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Awnings/shutters
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Awnings/shutters</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-green-500">✓</span> Junk removal
+                <li className="flex items-start gap-1 md:gap-2">
+                  <span className="text-green-500 text-xs md:text-base">✓</span> 
+                  <span>Junk removal</span>
                 </li>
               </ul>
             </div>
@@ -383,7 +408,7 @@ export default function OptimizedHome() {
               className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 text-base sm:text-lg font-bold rounded-lg shadow-lg"
             >
               Learn How to Broker These Services → $497
-            </Button>
+              </Button>
           </div>
         </div>
       </section>
@@ -407,17 +432,17 @@ export default function OptimizedHome() {
               </div>
             </div>
           </div>
-        </div>
+            </div>
       </section>
 
       {/* Lifestyle Transformation Section */}
       <section className="py-12 px-4 bg-white">
         <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
             <div className="relative group cursor-pointer">
               <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-lg">
-                <Image
-                  src="/home_1.jpg"
+                <Image 
+                  src="/home_1.jpg" 
                   alt="Day 0: The Hamster Wheel"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -428,12 +453,12 @@ export default function OptimizedHome() {
                   <p className="text-sm opacity-90">Trading time for money</p>
                 </div>
               </div>
-            </div>
+                </div>
             
             <div className="relative group cursor-pointer">
               <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-lg">
-                <Image
-                  src="/home_2.jpg"
+                <Image 
+                  src="/home_2.jpg" 
                   alt="Day 45: Building Systems"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -444,11 +469,11 @@ export default function OptimizedHome() {
                   <p className="text-sm opacity-90">Transitioning out of the grind</p>
                 </div>
               </div>
-            </div>
-            
+          </div>
+
             <div className="relative group cursor-pointer">
               <div className="relative aspect-[4/3] rounded-lg overflow-hidden shadow-lg">
-                <Image
+                <Image 
                   src="/home_3.jpg"
                   alt="Day 90: True Freedom"
                   fill
@@ -497,12 +522,12 @@ export default function OptimizedHome() {
               
               <p className="text-lg font-semibold">
                 Either way, you win. And at $497, it's a no-brainer.
-              </p>
-            </div>
-            
+            </p>
+          </div>
+          
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-600 mb-4">
-                ⚠️ Only 13 spots left at $497 (then price goes to $997)
+                ⚠️ Only {spotsLeft} spots left at $497 (then price goes to $997)
               </p>
               <Button 
                 onClick={() => document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' })}
@@ -525,7 +550,7 @@ export default function OptimizedHome() {
               Real Success Stories From Our Students
             </h2>
           </div>
-
+          
           {/* Twitter-style testimonials */}
           <div className="mb-6 md:mb-8">
             <TwitterTestimonialsGrid />
@@ -547,9 +572,9 @@ export default function OptimizedHome() {
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-600">
               The complete blueprint and community access
-            </p>
-          </div>
-
+              </p>
+            </div>
+            
           {/* Value Stack */}
           <div className="bg-gray-50 rounded-xl p-8 space-y-6">
             {[
@@ -562,7 +587,7 @@ export default function OptimizedHome() {
               <div key={i} className="flex items-center justify-between py-3 border-b border-gray-200">
                 <div className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
-                  <div>
+            <div>
                     <h4 className="font-semibold text-gray-900">{item.name}</h4>
                     <p className="text-sm text-gray-600">{item.desc}</p>
                   </div>
@@ -570,7 +595,7 @@ export default function OptimizedHome() {
                 <div className="text-right">
                   <p className="text-lg line-through text-gray-400">{item.value}</p>
                 </div>
-              </div>
+            </div>
             ))}
             
             <div className="pt-4 border-t-2 border-gray-300">
@@ -587,7 +612,7 @@ export default function OptimizedHome() {
               </p>
             </div>
           </div>
-
+          
           {/* Guarantee Badge */}
           <div className="mt-8 bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-6 border-2 border-green-300">
             <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
@@ -596,7 +621,7 @@ export default function OptimizedHome() {
                 <p className="text-gray-700">
                   Watch the video and implement the strategies for 30 days. 
                   If you don't see a clear path to $10K/month, get a full refund.
-                </p>
+            </p>
           </div>
         </div>
       </section>
@@ -642,7 +667,7 @@ export default function OptimizedHome() {
                 </summary>
                 <div className="px-5 pb-5 text-gray-700">
                   {faq.a}
-                </div>
+            </div>
               </details>
             ))}
           </div>
@@ -656,7 +681,7 @@ export default function OptimizedHome() {
             
             <h2 className="text-2xl sm:text-3xl font-bold mb-4">
               30-Day "Watch It & Profit" Guarantee
-            </h2>
+          </h2>
             
             <p className="text-xl text-gray-700 mb-6 leading-relaxed">
               Watch the entire 20-minute blueprint. Implement what you learn for 30 full days. 
@@ -735,7 +760,7 @@ export default function OptimizedHome() {
               <span className="hidden sm:block">Get Instant Access for $497 →</span>
             </Button>
             <p className="text-sm mt-4 opacity-90">
-              Only 13 spots left at $497 (returns to $997 after)
+              Only {spotsLeft} spots left at $497 (returns to $997 after)
             </p>
           </div>
         </div>

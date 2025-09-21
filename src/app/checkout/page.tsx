@@ -112,34 +112,15 @@ export default function CheckoutPage() {
       <div className="max-w-lg mx-auto px-4 py-6">
         {/* Compact Header */}
         <div className="flex items-center justify-between mb-4">
-          <ApexLogo size="sm" className="h-8 [&_div]:from-black [&_div]:to-gray-800" />
-          <div className="flex items-center gap-2 text-xs text-gray-600">
+          <ApexLogo size="sm" className="h-8" />
+          <div className="flex items-center gap-2 text-xs text-gray-400">
             <Lock className="w-3 h-3" />
             <span>SSL Secure</span>
           </div>
         </div>
 
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold">✓</div>
-            <span className="text-xs text-gray-600">Step 1</span>
-          </div>
-          <div className="w-12 h-px bg-gray-300"></div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">2</div>
-            <span className="text-xs font-semibold text-gray-900">Final Step</span>
-          </div>
-        </div>
-
-        {/* Product Title */}
-        <div className="text-center mb-4">
-          <h1 className="text-xl font-bold text-gray-900">20-Minute Blueprint Video</h1>
-          <p className="text-sm text-gray-600 mt-1">Everything you need for a $30K+/month business</p>
-        </div>
-
-        {/* Urgency + Price Combined */}
-        <div className={`bg-gradient-to-r ${spotsLeft <= 5 ? 'from-red-50 to-red-100' : 'from-red-50 to-yellow-50'} border ${spotsLeft <= 5 ? 'border-red-300' : 'border-red-200'} rounded-lg p-3 mb-4`}>
+        {/* Urgency + Price at TOP for mobile */}
+        <div className={`bg-gradient-to-r ${spotsLeft <= 5 ? 'from-red-50 to-red-100' : 'from-red-50 to-yellow-50'} border ${spotsLeft <= 5 ? 'border-red-300' : 'border-red-200'} rounded-lg p-3 mb-3`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
@@ -154,14 +135,20 @@ export default function CheckoutPage() {
           </div>
         </div>
 
+        {/* Product Title - Compact */}
+        <div className="mb-3">
+          <h1 className="text-lg font-bold text-gray-900">20-Minute Blueprint Video</h1>
+          <p className="text-xs text-gray-600">Everything you need for a $30K+/month business</p>
+        </div>
+
         {/* Checkout Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <h3 className="text-base font-semibold mb-3">Complete Your Order</h3>
+            <h3 className="text-sm font-semibold mb-2 text-gray-700">Complete Your Order</h3>
             
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-400 mb-1">
                   First Name *
                 </label>
                 <input
@@ -173,7 +160,7 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-400 mb-1">
                   Last Name *
                 </label>
                 <input
@@ -187,7 +174,7 @@ export default function CheckoutPage() {
             </div>
 
             <div className="mb-3">
-              <label className="block text-xs font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium text-gray-400 mb-1">
                 Email *
               </label>
               <input
@@ -200,43 +187,7 @@ export default function CheckoutPage() {
             </div>
           </div>
 
-          {/* What's Included - Detailed */}
-          <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 border border-green-200">
-            <p className="text-sm font-semibold text-gray-900 mb-3">✅ Everything you get today:</p>
-            <div className="space-y-2">
-              <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">20-Minute Blueprint Video</p>
-                  <p className="text-xs text-gray-600">The exact system to build your $30K/month business</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Private WhatsApp Community</p>
-                  <p className="text-xs text-gray-600">Connect with operators doing $30K+ monthly</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">Complete Template Pack</p>
-                  <p className="text-xs text-gray-600">Scripts, calculators, contracts - everything you need</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">$497 Full Program Credit</p>
-                  <p className="text-xs text-gray-600">Upgrade anytime and save your entire investment</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-          {/* Submit Button */}
+          {/* Submit Button - Moved UP for mobile */}
           <Button
             type="submit"
             disabled={isProcessing}
@@ -256,11 +207,75 @@ export default function CheckoutPage() {
           </Button>
 
           {/* Guarantee - Compact */}
-          <div className="text-center text-xs text-gray-600">
+          <div className="text-center text-xs text-gray-400">
             <CheckCircle className="w-3 h-3 text-green-500 inline mr-1" />
             30-Day Money-Back Guarantee
           </div>
         </form>
+
+        {/* What's Included - Below the fold on mobile */}
+        <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg p-4 border border-gray-200 mt-6">
+          <p className="text-sm font-semibold text-gray-900 mb-3">✅ Everything you get today:</p>
+          <div className="space-y-2">
+            <div className="flex items-start gap-2">
+              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">20-Minute Blueprint Video</p>
+                <p className="text-xs text-gray-600">The exact system to build your $30K/month business</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">Private WhatsApp Community</p>
+                <p className="text-xs text-gray-600">Connect with operators doing $30K+ monthly</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">Complete Template Pack</p>
+                <p className="text-xs text-gray-600">Scripts, calculators, contracts - everything you need</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-2">
+              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">$497 Full Program Credit</p>
+                <p className="text-xs text-gray-600">Upgrade anytime and save your entire investment</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Trust Badges */}
+        <div className="mt-8 pt-8 border-t border-gray-200">
+          <div className="flex flex-wrap justify-center items-center gap-4 text-xs text-gray-600">
+            <div className="flex items-center gap-1">
+              <Shield className="w-4 h-4" />
+              <span>256-bit SSL Encryption</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span>Instant Access</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              <span>Watch Anytime</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Customer Support */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-gray-500">
+            Questions? Email support@remoteops.ai
+          </p>
+          <p className="text-xs text-gray-400 mt-2">
+            Most operators make their investment back in the first deal
+          </p>
+        </div>
+        
       </div>
     </div>
   );

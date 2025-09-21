@@ -73,7 +73,7 @@ export default function BlueprintVideoPage() {
         <CardContent className="p-0">
           <div className="aspect-video bg-slate-gray/20 rounded-lg overflow-hidden">
             <iframe
-              src="https://www.loom.com/embed/5097dbc601a745909df6c6d850e6d2cc?sid=8031dc21-12fb-4997-b1ed-a4a8d510bdba&hide_speed=true"
+              src="https://www.loom.com/embed/5097dbc601a745909df6c6d850e6d2cc"
               frameBorder="0"
               allowFullScreen
               className="w-full h-full"
