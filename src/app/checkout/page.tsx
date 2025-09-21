@@ -12,8 +12,7 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [spotsLeft, setSpotsLeft] = useState(13);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    fullName: '',
     email: ''
   });
 
@@ -70,9 +69,16 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
+      // Split full name into first and last for storage
+      const nameParts = formData.fullName.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
       // Save purchase data for after payment
       const purchaseData = {
         ...formData,
+        firstName,
+        lastName,
         purchaseType: 'video',
         amount: 497,
         timestamp: new Date().toISOString()
@@ -81,8 +87,8 @@ export default function CheckoutPage() {
       // Save to localStorage to persist after redirect
       localStorage.setItem('pendingPurchase', JSON.stringify(purchaseData));
       localStorage.setItem('videoBuyerData', JSON.stringify({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        firstName,
+        lastName,
         email: formData.email,
         purchasedAt: new Date().toISOString()
       }));
@@ -146,31 +152,20 @@ export default function CheckoutPage() {
           <div>
             <h3 className="text-sm font-semibold mb-2 text-gray-700">Complete Your Order</h3>
             
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">
-                  First Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">
-                  Last Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
-                  required
-                />
-              </div>
+            <div className="mb-3">
+              <label className="block text-xs font-medium text-gray-400 mb-1">
+                Full Name *
+              </label>
+              <input
+                type="text"
+                value={formData.fullName}
+                onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                placeholder="John Smith"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
+                autoComplete="name"
+                name="name"
+                required
+              />
             </div>
 
             <div className="mb-3">
@@ -181,7 +176,8 @@ export default function CheckoutPage() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
+                placeholder="john@example.com"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
                 autoComplete="email"
                 name="email"
                 required
