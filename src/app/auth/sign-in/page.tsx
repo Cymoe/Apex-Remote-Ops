@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ApexLogo } from '@/components/apex-logo';
 import { CheckCircle } from 'lucide-react';
 
-export default function SignInPage() {
+function SignInContent() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -145,5 +145,17 @@ export default function SignInPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-carbon-black">
+        <div className="animate-spin h-8 w-8 border-2 border-professional-blue border-t-transparent rounded-full"></div>
+      </div>
+    }>
+      <SignInContent />
+    </Suspense>
   );
 }
