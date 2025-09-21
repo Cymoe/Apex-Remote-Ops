@@ -13,11 +13,11 @@ export async function GET(request: NextRequest) {
   // Try to get email from URL params first (if passed)
   let email = searchParams.get('email');
   console.log('Email from URL:', email);
+  console.log('Session ID:', sessionId);
   
-  // If no email in URL, we need to get it from the stored data
-  // Since we stored it in localStorage before redirect, we'll use a client-side page
-  // to retrieve it and pass it back
-  if (!email) {
+  // If we have a session_id but no email, we need to retrieve it from Stripe
+  // For now, we'll use the client-side approach to get email from localStorage
+  if (!email && sessionId) {
     // Return a client-side page that reads localStorage and redirects with email
     return new NextResponse(`
       <!DOCTYPE html>
@@ -63,12 +63,19 @@ export async function GET(request: NextRequest) {
           <script>
             // Get the stored email from localStorage
             const videoBuyerData = localStorage.getItem('videoBuyerData');
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session_id');
+            
             if (videoBuyerData) {
               const data = JSON.parse(videoBuyerData);
               const email = data.email;
               if (email) {
-                // Redirect with the email in the URL
-                window.location.href = '/checkout/success?email=' + encodeURIComponent(email);
+                // Redirect with both email and session_id in the URL
+                let redirectUrl = '/checkout/success?email=' + encodeURIComponent(email);
+                if (sessionId) {
+                  redirectUrl += '&session_id=' + encodeURIComponent(sessionId);
+                }
+                window.location.href = redirectUrl;
               } else {
                 // No email stored, redirect to sign-in
                 window.location.href = '/auth/sign-in?success=payment_complete';
@@ -96,6 +103,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    console.log('Processing checkout success for email:', email);
+    
     // Create admin client for database operations
     const adminSupabase = await createAdminClient();
     
