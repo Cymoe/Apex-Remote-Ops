@@ -199,17 +199,11 @@ export async function GET(request: NextRequest) {
     let emailResult: any;
     
     try {
-      if (isNewUser) {
-        // Send email with sign-in instructions
-        console.log('Sending welcome email to new video buyer:', email);
-        emailResult = await sendWelcomeEmailToVideoBuyer(email);
-        console.log('Welcome email result:', emailResult);
-      } else {
-        // Send purchase confirmation only
-        console.log('Sending purchase email to existing user:', email);
-        emailResult = await sendVideoPurchaseEmail(email);
-        console.log('Purchase email result:', emailResult);
-      }
+      // Send the same purchase confirmation email to everyone
+      // (Most people buying the video will be first-time buyers anyway)
+      console.log('Sending purchase confirmation email to:', email);
+      emailResult = await sendVideoPurchaseEmail(email);
+      console.log('Purchase email result:', emailResult);
       
       if (!emailResult?.success) {
         console.error('Email send failed with result:', emailResult);

@@ -199,7 +199,7 @@ export async function sendVideoPurchaseEmail(email: string) {
       from: FROM_EMAIL,
       to: email,
       replyTo: SUPPORT_EMAIL,
-      subject: '🎉 Welcome back! Your Blueprint is ready',
+      subject: '🎉 Your Blueprint Purchase is Complete!',
       html: `
         <!DOCTYPE html>
         <html>
@@ -215,7 +215,7 @@ export async function sendVideoPurchaseEmail(email: string) {
             </h1>
             
             <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
-              Congrats on making a smart investment. You just saved $500 and got everything you need to build a $30K/month remote service business.
+              Thank you for your purchase! Your 20-Minute Blueprint video is now available in your dashboard.
             </p>
             
             <div style="background: #f0fdf4; border: 2px solid #22c55e; padding: 20px; margin: 25px 0; border-radius: 8px;">
