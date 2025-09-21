@@ -4,11 +4,15 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { sendVideoPurchaseEmail, sendWelcomeEmailToVideoBuyer } from '@/lib/email/video-emails';
 
 export async function GET(request: NextRequest) {
+  console.log('=== CHECKOUT SUCCESS ROUTE CALLED ===');
+  console.log('URL:', request.url);
+  
   const searchParams = request.nextUrl.searchParams;
   const sessionId = searchParams.get('session_id');
   
   // Try to get email from URL params first (if passed)
   let email = searchParams.get('email');
+  console.log('Email from URL:', email);
   
   // If no email in URL, we need to get it from the stored data
   // Since we stored it in localStorage before redirect, we'll use a client-side page
@@ -143,12 +147,18 @@ export async function GET(request: NextRequest) {
     }
     
     // Send appropriate email
+    console.log('About to send email to:', email, 'isNewUser:', isNewUser);
+    
     if (isNewUser) {
       // Send email with sign-in instructions
-      await sendWelcomeEmailToVideoBuyer(email);
+      console.log('Sending welcome email to new video buyer:', email);
+      const emailResult = await sendWelcomeEmailToVideoBuyer(email);
+      console.log('Welcome email result:', emailResult);
     } else {
       // Send purchase confirmation only
-      await sendVideoPurchaseEmail(email);
+      console.log('Sending purchase email to existing user:', email);
+      const emailResult = await sendVideoPurchaseEmail(email);
+      console.log('Purchase email result:', emailResult);
     }
     
     // Generate magic link to automatically sign them in
