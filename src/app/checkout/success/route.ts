@@ -195,7 +195,7 @@ export async function GET(request: NextRequest) {
     console.log('Tagging subscriber in Beehiiv as customer...');
     try {
       const { beehiiv } = await import('@/lib/beehiiv/client');
-      const tagResult = await beehiiv.tagSubscriber(email, ['blueprint-buyer', 'customer']);
+      const tagResult = await beehiiv.tagSubscriber(email, ['customer', 'blueprint-buyer']);
       console.log('Beehiiv tag result:', tagResult);
     } catch (beehiivError) {
       console.error('Failed to tag in Beehiiv:', beehiivError);

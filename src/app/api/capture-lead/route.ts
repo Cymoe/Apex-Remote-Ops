@@ -102,6 +102,12 @@ export async function POST(request: NextRequest) {
         }
       });
       console.log('Beehiiv result:', beehiivResult);
+      
+      // Tag them as a lead (not yet customer)
+      if (beehiivResult.success) {
+        const tagResult = await beehiiv.tagSubscriber(email, ['lead']);
+        console.log('Tagged as lead:', tagResult);
+      }
     } catch (beehiivError) {
       console.error('Failed to add to Beehiiv:', beehiivError);
       // Don't fail the request if Beehiiv fails
