@@ -87,16 +87,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Send welcome email
-    console.log('Attempting to send welcome email to:', email);
-    try {
-      const { sendVideoWelcomeEmail } = await import('@/lib/email/video-emails');
-      const result = await sendVideoWelcomeEmail({ email });
-      console.log('Email send result:', result);
-    } catch (emailError) {
-      console.error('Failed to send welcome email:', emailError);
-      // Don't fail the whole request if email fails
-    }
+    // NOTE: Not sending nurture emails through Resend
+    // Resend is for transactional emails only (purchase confirmations, etc)
+    // For nurture/marketing emails, use a proper email marketing service
+    console.log('Lead saved. Not sending nurture email (Resend is for transactional only)');
 
     return NextResponse.json({
       success: true,
