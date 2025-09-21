@@ -21,16 +21,25 @@ export async function GET(request: NextRequest) {
   console.log('Session ID:', sessionId);
   
   // If we have a session_id, retrieve the customer data from Stripe
-  if (sessionId && !email) {
+  if (sessionId) {
     try {
+      console.log('Attempting to retrieve Stripe session:', sessionId);
       const session = await stripe.checkout.sessions.retrieve(sessionId);
-      console.log('Stripe session retrieved:', session.customer_email, session.payment_status);
+      console.log('Stripe session data:', {
+        id: session.id,
+        customer_email: session.customer_email,
+        payment_status: session.payment_status,
+        metadata: session.metadata
+      });
       
-      if (session.payment_status === 'paid' && session.customer_email) {
+      if (session.customer_email) {
         email = session.customer_email;
+        console.log('Email retrieved from Stripe:', email);
       }
-    } catch (error) {
-      console.error('Failed to retrieve Stripe session:', error);
+    } catch (error: any) {
+      console.error('Failed to retrieve Stripe session:', error?.message || error);
+      // In test mode, sometimes the session takes a moment to be available
+      // Let's add a fallback to check localStorage
     }
   }
   
