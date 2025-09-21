@@ -268,10 +268,7 @@ export default function CheckoutPage() {
         
         {/* Customer Support */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
-            Questions? Email support@remoteops.ai
-          </p>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xs text-gray-400">
             Most operators make their investment back in the first deal
           </p>
         </div>
