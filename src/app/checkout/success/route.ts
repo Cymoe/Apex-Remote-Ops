@@ -141,6 +141,13 @@ export async function GET(request: NextRequest) {
     const { data: existingUsers } = await adminSupabase.auth.admin.listUsers();
     const existingUser = existingUsers?.users?.find(u => u.email === email);
     
+    console.log('Checking for existing user:', email);
+    console.log('Found existing user?', !!existingUser);
+    if (existingUser) {
+      console.log('User ID:', existingUser.id);
+      console.log('User created at:', existingUser.created_at);
+    }
+    
     let userId: string;
     let isNewUser = false;
     
