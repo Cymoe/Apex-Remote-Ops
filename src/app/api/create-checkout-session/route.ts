@@ -6,8 +6,14 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 export async function POST(request: NextRequest) {
+  console.log('=== CREATE CHECKOUT SESSION ===');
+  console.log('Origin:', request.headers.get('origin'));
+  console.log('Host:', request.headers.get('host'));
+  
   try {
     const { email, fullName } = await request.json();
+    console.log('Email:', email);
+    console.log('Full Name:', fullName);
     
     if (!email) {
       return NextResponse.json(
@@ -16,6 +22,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Build success URL
+    const origin = request.headers.get('origin') || 'https://www.remoteops.ai';
+    const successUrl = `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}&email=${encodeURIComponent(email)}`;
+    const cancelUrl = `${origin}/checkout`;
+    
+    console.log('Success URL:', successUrl);
+    console.log('Cancel URL:', cancelUrl);
+    
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -35,8 +49,8 @@ export async function POST(request: NextRequest) {
       ],
       mode: 'payment',
       // Pass email as URL param since session_id isn't working in test mode
-      success_url: `${request.headers.get('origin') || 'https://www.remoteops.ai'}/checkout/success?session_id={CHECKOUT_SESSION_ID}&email=${encodeURIComponent(email)}`,
-      cancel_url: `${request.headers.get('origin') || 'https://www.remoteops.ai'}/checkout`,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       customer_email: email,
       metadata: {
         fullName: fullName || '',
