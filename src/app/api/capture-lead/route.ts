@@ -55,6 +55,26 @@ export async function POST(request: NextRequest) {
       if (updateError) {
         console.error('Error updating lead:', updateError);
       }
+      
+      // Add to Beehiiv even if existing lead (they might not be in Beehiiv yet)
+      console.log('Adding existing lead to Beehiiv...');
+      try {
+        const { beehiiv } = await import('@/lib/beehiiv/client');
+        const beehiivResult = await beehiiv.addSubscriber({
+          email,
+          utm_source: source || 'website',
+          utm_medium: 'lead_capture',
+          utm_campaign: 'blueprint_video',
+          tags: ['lead'],
+          custom_fields: [
+            { name: 'first_name', value: metadata?.firstName || '' },
+            { name: 'source', value: source || '' }
+          ]
+        });
+        console.log('Beehiiv result for existing lead:', beehiivResult);
+      } catch (beehiivError) {
+        console.error('Failed to add to Beehiiv:', beehiivError);
+      }
 
       return NextResponse.json({
         success: true,
@@ -96,18 +116,13 @@ export async function POST(request: NextRequest) {
         utm_source: source || 'website',
         utm_medium: 'lead_capture',
         utm_campaign: 'blueprint_video',
-        custom_fields: {
-          first_name: metadata?.firstName || '',
-          source: source,
-        }
+        tags: ['lead'], // Add tag during creation
+        custom_fields: [
+          { name: 'first_name', value: metadata?.firstName || '' },
+          { name: 'source', value: source || '' }
+        ]
       });
-      console.log('Beehiiv result:', beehiivResult);
-      
-      // Tag them as a lead (not yet customer)
-      if (beehiivResult.success) {
-        const tagResult = await beehiiv.tagSubscriber(email, ['lead']);
-        console.log('Tagged as lead:', tagResult);
-      }
+      console.log('Beehiiv result (with lead tag):', beehiivResult);
     } catch (beehiivError) {
       console.error('Failed to add to Beehiiv:', beehiivError);
       // Don't fail the request if Beehiiv fails

@@ -9,7 +9,7 @@ interface BeehiivSubscriber {
   utm_medium?: string;
   utm_campaign?: string;
   referring_site?: string;
-  custom_fields?: Record<string, any>;
+  custom_fields?: Array<{ name: string; value: string }>;
 }
 
 interface BeehiivTag {
@@ -31,13 +31,15 @@ export class BeehiivClient {
     }
   }
 
-  async addSubscriber(data: BeehiivSubscriber): Promise<{ success: boolean; id?: string; error?: string }> {
+  async addSubscriber(data: BeehiivSubscriber & { tags?: string[] }): Promise<{ success: boolean; id?: string; error?: string }> {
     if (!this.apiKey || !this.publicationId) {
       console.error('Beehiiv not configured');
       return { success: false, error: 'Beehiiv not configured' };
     }
 
     try {
+      const { tags, ...subscriberData } = data;
+      
       const response = await fetch(
         `${this.baseUrl}/publications/${this.publicationId}/subscriptions`,
         {
@@ -47,9 +49,10 @@ export class BeehiivClient {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            ...data,
+            ...subscriberData,
             reactivate_existing: true, // Reactivate if they unsubscribed
             send_welcome_email: false, // We handle welcome emails ourselves
+            // Note: Tags might need to be applied separately after creation
           }),
         }
       );
@@ -62,6 +65,16 @@ export class BeehiivClient {
 
       const result = await response.json();
       console.log('Added to Beehiiv:', result);
+      
+      // If tags were provided, apply them after a small delay to ensure subscriber is indexed
+      if (tags && tags.length > 0 && result.data?.email) {
+        console.log('Applying tags to new subscriber:', tags);
+        // Small delay to ensure Beehiiv has indexed the new subscriber
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const tagResult = await this.tagSubscriber(result.data.email, tags);
+        console.log('Tag result:', tagResult);
+      }
+      
       return { success: true, id: result.data?.id };
     } catch (error: any) {
       console.error('Beehiiv API error:', error);
