@@ -34,7 +34,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'payment',
-      success_url: `${request.headers.get('origin') || 'https://www.remoteops.ai'}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      // Pass email as URL param since session_id isn't working in test mode
+      success_url: `${request.headers.get('origin') || 'https://www.remoteops.ai'}/checkout/success?session_id={CHECKOUT_SESSION_ID}&email=${encodeURIComponent(email)}`,
       cancel_url: `${request.headers.get('origin') || 'https://www.remoteops.ai'}/checkout`,
       customer_email: email,
       metadata: {
