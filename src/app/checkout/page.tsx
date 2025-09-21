@@ -69,23 +69,29 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
-      // Split full name into first and last for storage
+      // Create Stripe checkout session
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          fullName: formData.fullName,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+
+      // Save data to localStorage as backup
       const nameParts = formData.fullName.trim().split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
       
-      // Save purchase data for after payment
-      const purchaseData = {
-        ...formData,
-        firstName,
-        lastName,
-        purchaseType: 'video',
-        amount: 497,
-        timestamp: new Date().toISOString()
-      };
-      
-      // Save to localStorage to persist after redirect
-      localStorage.setItem('pendingPurchase', JSON.stringify(purchaseData));
       localStorage.setItem('videoBuyerData', JSON.stringify({
         firstName,
         lastName,
@@ -93,21 +99,15 @@ export default function CheckoutPage() {
         purchasedAt: new Date().toISOString()
       }));
 
-      // Redirect to Stripe payment link with success URL
-      // After payment, Stripe will redirect to our success handler
-      const email = formData.email;
-      const successUrl = `${window.location.origin}/checkout/success?email=${encodeURIComponent(email)}`;
-      
-      // Stripe Payment Link with success URL parameter
-      // The success_url parameter works in production mode
-      const stripeUrl = new URL('https://buy.stripe.com/test_bJe7sLeeNeaWbOJ78i2VG00');
-      stripeUrl.searchParams.set('prefilled_email', email);
-      // In production, you can use: stripeUrl.searchParams.set('success_url', successUrl);
-      
-      // For test mode, we'll append email to the URL that Stripe redirects to
-      window.location.href = stripeUrl.toString();
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
     } catch (error) {
       console.error('Payment setup failed:', error);
+      alert('Failed to start checkout. Please try again.');
       setIsProcessing(false);
     }
   };

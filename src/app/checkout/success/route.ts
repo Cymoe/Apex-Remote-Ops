@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { sendVideoPurchaseEmail, sendWelcomeEmailToVideoBuyer } from '@/lib/email/video-emails';
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-12-18.acacia',
+});
 
 export async function GET(request: NextRequest) {
   console.log('=== CHECKOUT SUCCESS ROUTE CALLED ===');
@@ -15,9 +20,22 @@ export async function GET(request: NextRequest) {
   console.log('Email from URL:', email);
   console.log('Session ID:', sessionId);
   
-  // If we have a session_id but no email, we need to retrieve it from Stripe
-  // For now, we'll use the client-side approach to get email from localStorage
-  if (!email && sessionId) {
+  // If we have a session_id, retrieve the customer data from Stripe
+  if (sessionId && !email) {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      console.log('Stripe session retrieved:', session.customer_email, session.payment_status);
+      
+      if (session.payment_status === 'paid' && session.customer_email) {
+        email = session.customer_email;
+      }
+    } catch (error) {
+      console.error('Failed to retrieve Stripe session:', error);
+    }
+  }
+  
+  // If we still don't have an email, try the client-side approach
+  if (!email) {
     // Return a client-side page that reads localStorage and redirects with email
     return new NextResponse(`
       <!DOCTYPE html>
