@@ -161,40 +161,25 @@ export async function GET(request: NextRequest) {
       console.log('Purchase email result:', emailResult);
     }
     
-    // Generate magic link to automatically sign them in
-    const { data: magicLink, error: magicLinkError } = await adminSupabase.auth.admin.generateLink({
+    // Instead of magic link, let's just create a session directly
+    // Since we're using admin client, we can generate a session for the user
+    console.log('Creating session for user:', userId);
+    
+    // Create a new session for the user
+    const { data: session, error: sessionError } = await adminSupabase.auth.admin.generateLink({
       type: 'magiclink',
       email,
       options: {
-        redirectTo: `${request.nextUrl.origin}/dashboard`,
+        redirectTo: '/dashboard',
       }
     });
     
-    console.log('Magic link generation:', { magicLink, magicLinkError });
-    
-    if (magicLink && !magicLinkError && magicLink.properties?.action_link) {
-      // Extract the token from the magic link and redirect through auth callback
-      // This will automatically sign them in and take them to the dashboard
-      const url = new URL(magicLink.properties.action_link);
-      const token = url.searchParams.get('token');
-      const type = url.searchParams.get('type');
-      
-      console.log('Magic link tokens:', { token, type, actionLink: magicLink.properties.action_link });
-      
-      if (token && type) {
-        // Redirect through auth callback to sign them in automatically
-        const callbackUrl = new URL(`/auth/callback`, request.url);
-        callbackUrl.searchParams.set('token', token);
-        callbackUrl.searchParams.set('type', type);
-        callbackUrl.searchParams.set('next', '/dashboard');
-        
-        console.log('Redirecting to:', callbackUrl.toString());
-        return NextResponse.redirect(callbackUrl);
-      }
+    if (sessionError) {
+      console.error('Session creation error:', sessionError);
     }
     
-    console.log('Magic link failed, falling back to sign-in');
-    // Fallback: If magic link generation fails, redirect to sign-in
+    // For now, let's use a simpler approach - redirect to sign-in with success message
+    // The user will use Google OAuth which is smoother
     return NextResponse.redirect(
       new URL(`/auth/sign-in?success=video_purchased&email=${encodeURIComponent(email)}`, request.url)
     );

@@ -22,7 +22,9 @@ function SignInContent() {
     const email = searchParams.get('email');
     
     if (success === 'video_purchased') {
-      setSuccessMessage('Purchase successful! Sign in to access your Blueprint.');
+      setSuccessMessage('🎉 Purchase complete! Check your email, then sign in with Google to access your Blueprint video.');
+    } else if (success === 'payment_complete') {
+      setSuccessMessage('✅ Payment successful! Sign in to access your content.');
     }
   }, [searchParams]);
 
@@ -67,10 +69,10 @@ function SignInContent() {
 
           {/* Success Message */}
           {successMessage && (
-            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-              <div className="flex items-center justify-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-400" />
-                <p className="text-green-400 text-sm">{successMessage}</p>
+            <div className="bg-green-500/10 border-2 border-green-500 rounded-lg p-6 animate-pulse">
+              <div className="flex flex-col items-center justify-center gap-3">
+                <CheckCircle className="h-8 w-8 text-green-400" />
+                <p className="text-green-400 text-base font-medium text-center">{successMessage}</p>
               </div>
             </div>
           )}
