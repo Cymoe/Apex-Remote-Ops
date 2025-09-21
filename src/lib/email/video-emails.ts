@@ -185,10 +185,16 @@ export async function sendWelcomeEmailToVideoBuyer(email: string) {
 }
 
 export async function sendVideoPurchaseEmail(email: string) {
+  console.log('=== sendVideoPurchaseEmail CALLED ===');
+  console.log('To email:', email);
+  console.log('FROM_EMAIL:', FROM_EMAIL);
+  console.log('Resend API key exists:', !!process.env.RESEND_API_KEY);
+  
   const videoUrl = 'https://remoteops.ai/dashboard';
   const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_GROUP_LINK || '#';
   
   try {
+    console.log('Attempting to send email via Resend...');
     const result = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
@@ -277,9 +283,11 @@ export async function sendVideoPurchaseEmail(email: string) {
       `
     });
     
+    console.log('Email send result:', result);
     return { success: true, id: result.data?.id };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to send purchase email:', error);
-    return { success: false, error };
+    console.error('Error details:', error?.message || error);
+    return { success: false, error: error?.message || String(error) };
   }
 }

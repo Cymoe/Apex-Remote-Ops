@@ -11,6 +11,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function GET(request: NextRequest) {
   console.log('=== CHECKOUT SUCCESS ROUTE CALLED ===');
   console.log('URL:', request.url);
+  console.log('Environment:', process.env.NODE_ENV);
+  console.log('Host:', request.headers.get('host'));
   
   const searchParams = request.nextUrl.searchParams;
   const sessionId = searchParams.get('session_id');

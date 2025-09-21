@@ -18,7 +18,7 @@ export default async function DashboardLayout({
       
       {/* Main content with left margin for sidebar */}
       <main className="md:ml-64 min-h-screen bg-carbon-black">
-        <div className="p-4 sm:p-6 lg:p-8 bg-carbon-black pt-20 md:pt-4">
+        <div className="p-4 sm:p-6 lg:p-8 bg-carbon-black pt-24 md:pt-4">
           {children}
         </div>
       </main>
