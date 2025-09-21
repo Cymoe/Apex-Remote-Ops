@@ -49,6 +49,33 @@ export function TwoStepApply() {
       purchaseType: 'video'
     }));
     
+    // Send email to backend to capture lead
+    console.log('Sending email to capture lead API:', email);
+    try {
+      const response = await fetch('/api/capture-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          source: 'two-step-form',
+          metadata: {
+            page: window.location.pathname,
+            timestamp: new Date().toISOString()
+          }
+        })
+      });
+      
+      const data = await response.json();
+      console.log('API Response:', data);
+      
+      if (!response.ok) {
+        console.error('Failed to capture lead:', data);
+      }
+    } catch (error) {
+      console.error('Error capturing lead:', error);
+      // Continue anyway - don't block the user
+    }
+    
     // Short delay for UX then go to step 2
     setTimeout(() => {
       setIsProcessing(false);
@@ -79,7 +106,7 @@ export function TwoStepApply() {
               Get instant access to the complete blueprint
             </p>
             <p className="text-lg font-bold text-green-600 mt-2">
-              Only $497 Today (Save $11,503)
+              Only $497 Today (Save $500)
             </p>
           </div>
 
@@ -169,7 +196,7 @@ export function TwoStepApply() {
             </ul>
             <div className="mt-3 pt-3 border-t border-green-200">
               <p className="text-center">
-                <span className="text-gray-500 line-through">Regular: $12,000</span>
+                <span className="text-gray-500 line-through">Regular: $997</span>
                 <span className="text-green-700 font-bold text-lg ml-2">Today: $497</span>
               </p>
             </div>

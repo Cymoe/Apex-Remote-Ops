@@ -422,7 +422,8 @@ export default function Home() {
               Ready to Claim Your Piece of This $84T Opportunity?
             </h3>
             <p className="text-zinc-300 mb-6">
-              Watch our 20-minute training that reveals the exact system to build your remote renovation business
+              Watch our 20-minute training that reveals the exact system<br />
+              to build your $30K/month remote home service business
             </p>
             <Link href="/lp/operator-497">
               <Button className="bg-white text-zinc-900 hover:bg-gray-100 px-8 py-3 text-lg font-semibold">
@@ -430,7 +431,7 @@ export default function Home() {
               </Button>
             </Link>
             <p className="text-zinc-400 text-sm mt-4">
-              Special price saves you $11,503 off the full program
+              Special price saves you $500 off the full program
             </p>
           </div>
         </div>
@@ -636,7 +637,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
               <ApexLogo size="sm" className="[&_div]:from-black [&_div]:to-gray-800" />
-              <span className="text-sm text-gray-600">© 2024 Remote Operations. All rights reserved.</span>
+              <span className="text-sm text-gray-600">© {new Date().getFullYear()} Remote Operations. All rights reserved.</span>
             </div>
             
             <nav className="flex gap-6">

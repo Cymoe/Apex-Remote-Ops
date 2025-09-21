@@ -103,11 +103,11 @@ export default function CheckoutPage() {
           </p>
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-gray-500 line-through text-sm">$12,000</span>
+              <span className="text-gray-500 line-through text-sm">$997</span>
               <span className="text-2xl font-bold text-green-600 ml-2">$497</span>
             </div>
             <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded">
-              Save $11,503
+              Save $500
             </span>
           </div>
         </div>

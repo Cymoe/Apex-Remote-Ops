@@ -333,7 +333,7 @@ export default function VideoAccessPage() {
 
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-gray-800 text-center text-sm text-gray-400">
-        <p>© 2025 APEX Operations LLC. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} APEX Operations LLC. All rights reserved.</p>
         <div className="flex justify-center gap-6 mt-4">
           <Link href="/support" className="hover:text-white">Support</Link>
           <Link href="/terms" className="hover:text-white">Terms</Link>

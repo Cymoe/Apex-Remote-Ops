@@ -12,10 +12,10 @@ import { useRouter } from 'next/navigation';
 import { UrgencyBar } from '@/components/landing/urgency-bar';
 import { ExitIntentPopup } from '@/components/landing/exit-intent-popup';
 import { TwoStepApply } from '@/components/landing/two-step-apply';
+import { TwitterTestimonialsGrid } from '@/components/landing/twitter-testimonials';
 
 export default function OptimizedHome() {
   const router = useRouter();
-  const [availableSpots, setAvailableSpots] = useState(5);
   const [showGuarantee, setShowGuarantee] = useState(false);
   
   // Track scroll for sticky CTA
@@ -62,11 +62,10 @@ export default function OptimizedHome() {
             <div>
               
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 leading-tight">
-                Everything You Need to Build a{' '}
-                <span className="text-blue-600">$30K+/Month</span>{' '}
-                Remote Renovation Business
-                <span className="text-gray-600 font-normal text-lg sm:text-xl md:text-2xl lg:text-3xl block mt-3">
-                  In One 20-Minute Video
+                Build a <span className="text-blue-600">$30K/Month</span><br />
+                Remote Home Service Business<br />
+                <span className="text-gray-600 font-normal text-base sm:text-lg md:text-xl">
+                  (In One 20-Minute Video)
                 </span>
               </h1>
               
@@ -109,7 +108,7 @@ export default function OptimizedHome() {
                 <li className="flex items-start gap-3">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mt-0.5 flex-shrink-0" />
                   <span className="text-sm sm:text-base text-gray-700">
-                    <strong>Work From Anywhere:</strong> Bali, Dubai, Singapore, Miami - manage crews remotely
+                    <strong>Work From Anywhere:</strong> Bali, Dubai, Miami, or from home - manage crews remotely
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -121,10 +120,29 @@ export default function OptimizedHome() {
               </ul>
 
 
-              {/* Limited Seats Alert */}
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-6">
+            </div>
+
+            {/* Right Column - Video + Form */}
+            <div className="space-y-6">
+              {/* Video */}
+              <div className="relative aspect-video bg-gray-900 rounded-xl shadow-2xl overflow-hidden">
+                <iframe
+                  src="https://www.loom.com/embed/c954a298a53c45dfb558460b77a79552?autoplay=1"
+                  className="absolute inset-0 w-full h-full"
+                  style={{ border: '0' }}
+                  allowFullScreen
+                />
+              </div>
+              
+              {/* Form */}
+              <div id="apply-form">
+                <TwoStepApply />
+              </div>
+              
+              {/* Pricing Box */}
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
                 <p className="text-lg font-bold text-gray-800 text-center mb-1">
-                  <span className="line-through text-gray-600">Regular Price: $12,000</span>
+                  <span className="line-through text-gray-600">Regular Price: $997</span>
                 </p>
                 <p className="text-2xl font-bold text-green-700 text-center mb-3">
                   Special Price: $497
@@ -132,40 +150,233 @@ export default function OptimizedHome() {
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
                   <p className="text-sm font-semibold text-red-800">
-                    Only {availableSpots} seats remaining at this price
+                    ⚠️ Only 13 spots left at this price
                   </p>
                 </div>
               </div>
-            </div>
-
-            {/* Right Column - Two-Step Apply */}
-            <div id="apply-form">
-              <TwoStepApply />
             </div>
           </div>
         </div>
       </section>
 
 
-      {/* Video Section - Mobile Optimized */}
-      <section className="py-12 md:py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          
-          {/* Video with play button overlay */}
-          <div className="relative aspect-video bg-gray-900 rounded-xl shadow-2xl overflow-hidden group cursor-pointer">
-            <iframe
-              src="https://www.loom.com/embed/c954a298a53c45dfb558460b77a79552?autoplay=1"
-              className="absolute inset-0 w-full h-full"
-              style={{ border: '0' }}
-              allowFullScreen
-            />
+
+      {/* WhatsApp Community Section - Major Value Add */}
+      <section className="py-12 px-4 bg-gradient-to-br from-green-50 to-green-100">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-xl shadow-xl p-8 border-2 border-green-300">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full mb-4">
+                <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.149-.67.149-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5.5 15.5c0 .55-.45 1-1 1H7.5c-.55 0-1-.45-1-1v-11c0-.55.45-1 1-1h9c.55 0 1 .45 1 1v11z"/>
+                </svg>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">
+                Join Our Private WhatsApp Community
+              </h2>
+              <p className="text-lg text-gray-600">
+                Connect with operators building remote service businesses
+              </p>
+            </div>
+
+            <div className="text-center mb-6">
+              <p className="text-gray-700">
+                Discuss AI tools, systems, hiring, and making money with service businesses.
+                <br />
+                Share what's working. Get help when stuck.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-lg p-4 text-center">
+              <p className="text-sm text-gray-600">
+                Included with your purchase • WhatsApp invite sent after payment
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Myles Bio Section */}
+      <section className="py-16 px-4 bg-gray-50">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <Image
+                src="/myles.jpg"
+                alt="Myles Webb, Remote Operations"
+                width={400}
+                height={500}
+                className="rounded-lg shadow-xl grayscale scale-110"
+              />
+            </div>
+            <div>
+              <p className="text-sm uppercase tracking-wider text-gray-600 mb-4">FROM THE FOUNDER</p>
+              <h2 className="text-3xl font-bold mb-4">
+                "I Went From $0 to $1.2M Running Renovation Businesses From My Laptop"
+              </h2>
+              <p className="text-gray-700 mb-4">
+                Hey, I'm Myles. Five years ago, I was stuck in the same trap you're in now. Trading time for money, watching my income plateau, knowing there had to be something better.
+              </p>
+              <p className="text-gray-700 mb-4">
+                Then I discovered something counterintuitive: While everyone was chasing tech startups and crypto, the real money was hiding in "boring" businesses nobody wanted to talk about. Renovation. Flooring. Painting. The unsexy stuff that actually pays.
+              </p>
+              <p className="text-gray-700 mb-4">
+                Today, I run multiple six-figure renovation businesses from anywhere—Bali, Miami, Portugal—using just my phone and laptop. No tools, no trucks, no on-site visits. Just smart systems and the right approach.
+              </p>
+              <p className="text-lg font-semibold text-gray-900 mb-4">
+                I've condensed everything into the 20-minute video above. Watch it, then decide if you're ready to build something real.
+              </p>
+              <p className="italic text-gray-600">
+                — Myles Webb, Remote Operations
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* The Projects That Print Money Section */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-sm uppercase tracking-wider text-green-600 mb-3">THE OPPORTUNITY</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              The Projects That Print Money
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <strong>You don't do ANY of this work</strong> - you broker it. 
+              Crews do the labor, you manage from your laptop. <strong>40-60% profit margins.</strong>
+            </p>
+          </div>
+
+          {/* Featured High-Ticket Services */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200">
+              <div className="text-3xl mb-3">🚿</div>
+              <h3 className="font-bold text-lg mb-2">Bathroom Remodels</h3>
+              <p className="text-3xl font-bold text-blue-700 mb-1">$8-15K</p>
+              <p className="text-sm text-gray-600">Average project • 2 weeks</p>
+            </div>
             
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border-2 border-green-200">
+              <div className="text-3xl mb-3">🏡</div>
+              <h3 className="font-bold text-lg mb-2">Deck & Patio</h3>
+              <p className="text-3xl font-bold text-green-700 mb-1">$10-25K</p>
+              <p className="text-sm text-gray-600">Summer rush season</p>
+            </div>
+            
+            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-6 border-2 border-yellow-200">
+              <div className="text-3xl mb-3">♻️</div>
+              <h3 className="font-bold text-lg mb-2">Eco Upgrades</h3>
+              <p className="text-3xl font-bold text-yellow-700 mb-1">$5-20K</p>
+              <p className="text-sm text-gray-600">Rebates available</p>
+            </div>
+            
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-purple-200">
+              <div className="text-3xl mb-3">🌿</div>
+              <h3 className="font-bold text-lg mb-2">Biophilic Design</h3>
+              <p className="text-3xl font-bold text-purple-700 mb-1">$15-40K</p>
+              <p className="text-sm text-gray-600">Premium clients</p>
+            </div>
+          </div>
+
+          {/* Additional Services Grid */}
+          <div className="bg-gray-50 rounded-xl p-8">
+            <h3 className="font-bold text-lg mb-6 text-center">
+              Plus These High-Margin Services You Can Broker:
+            </h3>
+            <div className="grid md:grid-cols-3 gap-4 text-sm">
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Garage floor coating
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Outdoor hardscaping
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Sauna/cold plunge install
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Landscape lighting
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Emergency restoration
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Exterior brick painting
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Concrete resurfacing
+                </li>
+              </ul>
+              
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Sports courts
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Premium playgrounds
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Custom closet systems
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Excavation projects
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Senior retrofitting
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Commercial construction
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Pool building/cleaning
+                </li>
+              </ul>
+              
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Paving & asphalt
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Pet waste removal
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Garage door install
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Insulation services
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Glass installation
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Awnings/shutters
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-500">✓</span> Junk removal
+                </li>
+              </ul>
+            </div>
+            
+            <div className="mt-8 text-center">
+              <p className="text-gray-700 font-medium mb-2">
+                🎯 <strong>The Strategy:</strong> Pick ONE to start. Master it. Then expand.
+              </p>
+              <p className="text-sm text-gray-600">
+                Every service above can generate $10-30K/month when operated correctly
+              </p>
+            </div>
           </div>
           
-          <p className="text-sm text-gray-600 mt-6">
-            <strong>⚠️ Important:</strong> This video reveals our exact pricing strategy 
-            (normally $997 to access)
-          </p>
+          <div className="mt-8 text-center">
+            <Button 
+              onClick={() => document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 text-lg font-bold rounded-lg shadow-lg"
+            >
+              Learn How to Broker These Services → $497
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -246,157 +457,17 @@ export default function OptimizedHome() {
         </div>
       </section>
 
-      {/* Myles Bio Section */}
-      <section className="py-16 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <Image
-                src="/myles.jpg"
-                alt="Myles Webb, Remote Operations"
-                width={400}
-                height={500}
-                className="rounded-lg shadow-xl grayscale scale-110"
-              />
-            </div>
-            <div>
-              <p className="text-sm uppercase tracking-wider text-gray-600 mb-4">FROM THE FOUNDER</p>
-              <h2 className="text-3xl font-bold mb-4">
-                "I Went From $0 to $1.2M Running Renovation Businesses From My Laptop"
-              </h2>
-              <p className="text-gray-700 mb-4">
-                Hey, I'm Myles. Five years ago, I was stuck in the same trap you're in now. Trading time for money, watching my income plateau, knowing there had to be something better.
-              </p>
-              <p className="text-gray-700 mb-4">
-                Then I discovered something counterintuitive: While everyone was chasing tech startups and crypto, the real money was hiding in "boring" businesses nobody wanted to talk about. Renovation. Flooring. Painting. The unsexy stuff that actually pays.
-              </p>
-              <p className="text-gray-700 mb-4">
-                Today, I run multiple six-figure renovation businesses from anywhere—Bali, Miami, Portugal—using just my phone and laptop. No tools, no trucks, no on-site visits. Just smart systems and the right approach.
-              </p>
-              <p className="text-lg font-semibold text-gray-900 mb-4">
-                Below is the exact 12-minute breakdown of how this model works. Watch it, then decide if you're ready to build something real.
-              </p>
-              <p className="italic text-gray-600">
-                — Myles Webb, Remote Operations
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Value Stack Section - What's Included */}
-      <section className="py-12 md:py-16 px-4 bg-gradient-to-br from-green-50 to-white">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10">
-            <p className="text-sm uppercase tracking-wider text-green-600 mb-4">THE COMPLETE BLUEPRINT</p>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Everything You Get in the 20-Minute Video
-            </h2>
-            <p className="text-xl text-gray-600">
-              No courses. No modules. Just one video with everything.
-            </p>
-          </div>
-
-          <div className="space-y-4 mb-8">
-            {/* Value Stack Items */}
-            <div className="bg-white rounded-lg p-4 flex items-center justify-between border-l-4 border-green-500 shadow-sm">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
-                <div>
-                  <h4 className="font-bold">The Exact Crew Hiring Scripts</h4>
-                  <p className="text-sm text-gray-600">Word-for-word scripts that get quality crews to say yes</p>
-                </div>
-              </div>
-              <span className="text-gray-500 font-medium whitespace-nowrap">$2,000 Value</span>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 flex items-center justify-between border-l-4 border-green-500 shadow-sm">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
-                <div>
-                  <h4 className="font-bold">Territory Domination Strategy</h4>
-                  <p className="text-sm text-gray-600">How to lock down your city and eliminate competition</p>
-                </div>
-              </div>
-              <span className="text-gray-500 font-medium whitespace-nowrap">$3,000 Value</span>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 flex items-center justify-between border-l-4 border-green-500 shadow-sm">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
-                <div>
-                  <h4 className="font-bold">The 60% Profit Pricing Formula</h4>
-                  <p className="text-sm text-gray-600">My calculator that ensures 40-60% margins on every job</p>
-                </div>
-              </div>
-              <span className="text-gray-500 font-medium whitespace-nowrap">$1,500 Value</span>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 flex items-center justify-between border-l-4 border-green-500 shadow-sm">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
-                <div>
-                  <h4 className="font-bold">Lead Generation System</h4>
-                  <p className="text-sm text-gray-600">3 sources that deliver 50+ qualified leads per month</p>
-                </div>
-              </div>
-              <span className="text-gray-500 font-medium whitespace-nowrap">$2,500 Value</span>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 flex items-center justify-between border-l-4 border-green-500 shadow-sm">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
-                <div>
-                  <h4 className="font-bold">Contract Templates & Legal Docs</h4>
-                  <p className="text-sm text-gray-600">The exact contracts I use (lawyer-approved)</p>
-                </div>
-              </div>
-              <span className="text-gray-500 font-medium whitespace-nowrap">$1,000 Value</span>
-            </div>
-
-            <div className="bg-white rounded-lg p-4 flex items-center justify-between border-l-4 border-green-500 shadow-sm">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
-                <div>
-                  <h4 className="font-bold">First 30 Days Roadmap</h4>
-                  <p className="text-sm text-gray-600">Day-by-day plan to your first $10K month</p>
-                </div>
-              </div>
-              <span className="text-gray-500 font-medium whitespace-nowrap">$2,000 Value</span>
-            </div>
-          </div>
-
-          {/* Total Value */}
-          <div className="bg-gray-900 text-white rounded-xl p-6 text-center">
-            <p className="text-lg mb-2">Total Value of Everything You're Getting:</p>
-            <p className="text-4xl font-bold mb-4">$12,000</p>
-            <div className="w-full h-px bg-gray-700 my-4"></div>
-            <p className="text-xl mb-2">But You Won't Pay $12,000...</p>
-            <p className="text-xl mb-2">You Won't Even Pay $2,000...</p>
-            <p className="text-3xl font-bold text-green-400">
-              Get Everything Today For Just $497
-            </p>
-            <Button 
-              onClick={() => document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' })}
-              className="mt-6 bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg font-bold rounded-lg"
-            >
-              Yes! Give Me The 20-Minute Blueprint →
-            </Button>
-          </div>
-        </div>
-      </section>
-
       {/* Price Justification - Why Only $497? */}
       <section className="py-12 md:py-16 px-4 bg-white">
         <div className="max-w-3xl mx-auto">
           <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-8">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">
-              "Why Would You Give Away $12,000 Worth of Secrets for $497?"
+              "Why Only $497?"
             </h2>
             
             <div className="space-y-4 text-gray-700">
               <p className="text-lg">
-                <strong>Here's the truth:</strong> I used to charge $12,000 for my private coaching program where I'd spend 
+                <strong>Here's the truth:</strong> I used to charge thousands for my private coaching program where I'd spend 
                 8 weeks teaching this exact system.
               </p>
               
@@ -412,7 +483,7 @@ export default function OptimizedHome() {
               
               <p className="bg-white border-l-4 border-yellow-500 p-4 italic">
                 "I'm basically putting myself out of business by giving this away for $497. But here's my bet: 
-                <strong> 10% of you will want my help implementing and will upgrade to the $12K program.</strong> 
+                <strong> 10% of you will want my help implementing and will upgrade to the full APEX license.</strong> 
                 The other 90%? You'll take this blueprint and run with it."
               </p>
               
@@ -423,7 +494,7 @@ export default function OptimizedHome() {
             
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-600 mb-4">
-                ⚠️ Fair Warning: After 100 sales, the price goes to $997
+                ⚠️ Only 13 spots left at $497 (then price goes to $997)
               </p>
               <Button 
                 onClick={() => document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' })}
@@ -446,79 +517,14 @@ export default function OptimizedHome() {
             </h2>
           </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-            {/* Success Card 1 */}
-            <div className="bg-white rounded-xl p-6 shadow-lg border-2 border-green-200 relative">
-              <div className="absolute -top-3 -right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                TOP PERFORMER
-              </div>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  MC
-                </div>
-                <div>
-                  <h4 className="font-bold">Marcel C.</h4>
-                  <p className="text-sm text-gray-600">Phoenix, AZ</p>
-                </div>
-              </div>
-              <p className="text-3xl font-bold text-green-600 mb-2">$67,234/month</p>
-              <p className="text-gray-700 mb-3 text-sm">
-                "Quit my $85K job after month 4. Best decision ever. The system literally runs itself."
-              </p>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Clock className="w-3 h-3" />
-                <span>Started 8 months ago</span>
-              </div>
-            </div>
-
-            {/* Success Card 2 */}
-            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  SK
-                </div>
-                <div>
-                  <h4 className="font-bold">Sarah K.</h4>
-                  <p className="text-sm text-gray-600">Dallas, TX</p>
-                </div>
-              </div>
-              <p className="text-3xl font-bold text-green-600 mb-2">$32,150/month</p>
-              <p className="text-gray-700 mb-3 text-sm">
-                "Single mom, needed flexibility. Hit $30K in month 5. My kids barely notice I work."
-              </p>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Clock className="w-3 h-3" />
-                <span>Started 6 months ago</span>
-              </div>
-            </div>
-
-            {/* Success Card 3 */}
-            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  MR
-                </div>
-                <div>
-                  <h4 className="font-bold">Mike R.</h4>
-                  <p className="text-sm text-gray-600">Atlanta, GA</p>
-                </div>
-              </div>
-              <p className="text-3xl font-bold text-green-600 mb-2">$28,420/month</p>
-              <p className="text-gray-700 mb-3 text-sm">
-                "Was skeptical. Now running 3 crews remotely from Thailand. Living the dream."
-              </p>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Clock className="w-3 h-3" />
-                <span>Started 5 months ago</span>
-              </div>
-            </div>
+          {/* Twitter-style testimonials */}
+          <div className="mb-6 md:mb-8">
+            <TwitterTestimonialsGrid />
           </div>
 
           <div className="text-center">
-            <p className="text-gray-600 mb-4">Average time to first $10K month: <strong>67 days</strong></p>
-            <Button variant="outline" className="border-blue-600 text-blue-600 hover:bg-blue-50">
-              Watch More Video Testimonials →
-            </Button>
+            <p className="text-gray-600">Average time to first $10K month: <strong>67 days</strong></p>
+            <p className="text-xs text-gray-500 mt-2">*Results not typical. See earnings disclaimer.</p>
           </div>
         </div>
       </section>
@@ -528,23 +534,21 @@ export default function OptimizedHome() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Everything You Need to Hit $30K/Month
+              What You Get for $497
             </h2>
             <p className="text-xl text-gray-600">
-              Not just training. A complete business system worth $47,982
+              The complete blueprint and community access
             </p>
           </div>
 
           {/* Value Stack */}
           <div className="bg-gray-50 rounded-xl p-8 space-y-6">
             {[
-              { name: '30-Day Launch System', value: '$4,997', desc: 'Step-by-step roadmap to your first deal' },
-              { name: '127 Done-For-You Templates', value: '$2,997', desc: 'Contracts, SOPs, scripts, emails - everything' },
-              { name: 'Crew Hiring & Training Videos', value: '$1,997', desc: 'Find, hire, and manage remote crews' },
-              { name: 'Territory Protection Rights', value: '$19,997', desc: 'Exclusive access to your entire city' },
-              { name: 'WhatsApp Mastermind (12 mo)', value: '$2,997', desc: 'Direct access to 6 & 7-figure operators' },
-              { name: 'Weekly Group Coaching Calls', value: '$4,997', desc: 'Live troubleshooting every Tuesday' },
-              { name: 'Vendor Network Access', value: '$9,997', desc: 'Pre-negotiated rates with 500+ suppliers' },
+              { name: '20-Minute Video Blueprint', value: '$997', desc: 'The exact system revealed step-by-step' },
+              { name: 'Crew Hiring Scripts', value: '$497', desc: 'Word-for-word scripts that get crews to say yes' },
+              { name: 'Pricing Calculator', value: '$297', desc: '60% profit margin formula on every job' },
+              { name: 'Client Acquisition Templates', value: '$397', desc: 'Proven templates for getting your first customers' },
+              { name: 'WhatsApp Community Access', value: '$297', desc: 'Connect with active operators sharing what works' },
             ].map((item, i) => (
               <div key={i} className="flex items-center justify-between py-3 border-b border-gray-200">
                 <div className="flex items-start gap-3">
@@ -563,14 +567,14 @@ export default function OptimizedHome() {
             <div className="pt-4 border-t-2 border-gray-300">
               <div className="flex items-center justify-between">
                 <p className="text-xl font-bold">Total Value:</p>
-                <p className="text-2xl line-through text-gray-400">$47,982</p>
+                <p className="text-2xl line-through text-gray-400">$2,485</p>
               </div>
               <div className="flex items-center justify-between mt-2">
                 <p className="text-xl font-bold text-green-600">Your Investment Today:</p>
-                <p className="text-3xl font-bold text-green-600">$6,997</p>
+                <p className="text-3xl font-bold text-green-600">$497</p>
               </div>
               <p className="text-center text-sm text-gray-600 mt-4">
-                or 3 payments of $2,497 (0% interest)
+                One-time payment - instant access
               </p>
             </div>
           </div>
@@ -581,11 +585,11 @@ export default function OptimizedHome() {
               <Shield className="w-16 h-16 text-green-600" />
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  30-Day "Take Action" Guarantee
+                  30-Day Money-Back Guarantee
                 </h3>
                 <p className="text-gray-700">
-                  Follow the system for 30 days. If you don't book your first job, 
-                  we'll work with you 1-on-1 until you do, or refund 100%.
+                  Watch the video and implement the strategies for 30 days. 
+                  If you don't see a clear path to $10K/month, get a full refund.
                 </p>
               </div>
             </div>
@@ -603,8 +607,8 @@ export default function OptimizedHome() {
           <div className="space-y-4">
             {[
               {
-                q: "Is this really everything, or do I need the $12k program?",
-                a: "The 20-minute video contains 100% of the strategy and tactics. Nothing is held back. The $12k program is for people who want us to implement everything FOR them - done-for-you templates, personal coaching, hand-holding. If you're a self-starter who just needs the blueprint, the $497 video is all you need."
+                q: "Is this really everything, or do I need the full APEX license?",
+                a: "The 20-minute video contains the exact blueprint I used to build my business. You'll learn the crew hiring scripts, pricing formulas, lead generation methods, and get access to our private WhatsApp group where operators share what's working now."
               },
               {
                 q: "How is 20 minutes enough to teach everything?",
@@ -612,11 +616,11 @@ export default function OptimizedHome() {
               },
               {
                 q: "What exactly do I get for $497?",
-                a: "One 20-minute video that reveals the entire system. Plus, we include the essential templates as a bonus: crew hiring scripts, pricing calculator, and client acquisition formula. That's it. No modules to navigate, no community to participate in, no weekly calls. Just the blueprint."
+                a: "One 20-minute video that reveals the entire system. Plus, you get access to our private WhatsApp community where real operators share what's working now - AI tools, systems, hiring strategies, and scaling tactics. We also include essential templates as a bonus: crew hiring scripts, pricing calculator, and client acquisition formula. Simple and actionable."
               },
               {
                 q: "Why so cheap if this really works?",
-                a: "Because charging $497 means we'll sell 100x more than at $12k. We make our money on volume, and some buyers will eventually upgrade to the full program. Plus, at this price point, there's no excuse not to try it. We'd rather have 1,000 operators succeeding than 10."
+                a: "Because I want to prove this works at scale. At $497, there's no excuse not to try it. Plus, you get access to our WhatsApp community where successful operators are sharing real strategies daily."
               },
               {
                 q: "Can I really make $30k/month from a 20-minute video?",
@@ -655,7 +659,7 @@ export default function OptimizedHome() {
             
             <p className="text-xl text-gray-700 mb-6 leading-relaxed">
               Watch the entire 20-minute blueprint. Implement what you learn for 30 full days. 
-              If you don't see a clear path to $10k/month, or if you don't land your first deal, 
+              If you don't see a clear path to $10k/month, 
               we'll refund every penny.
             </p>
             
@@ -690,7 +694,7 @@ export default function OptimizedHome() {
             
             <Button 
               onClick={() => {
-                const element = document.querySelector('#apply-section');
+                const element = document.querySelector('#apply-form');
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
               size="lg"
@@ -714,11 +718,12 @@ export default function OptimizedHome() {
               Ready to Claim Your Piece of This $84T Opportunity?
             </h2>
             <p className="text-lg md:text-xl mb-8 opacity-95">
-              Watch our 20-minute training that reveals the exact system to build your remote renovation business
+              Watch our 20-minute training that reveals the exact system<br />
+              to build your $30K/month remote home service business
             </p>
             <Button 
               onClick={() => {
-                const element = document.querySelector('#apply-section');
+                const element = document.querySelector('#apply-form');
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
               size="lg"
@@ -727,7 +732,7 @@ export default function OptimizedHome() {
               Get Instant Access for $497 →
             </Button>
             <p className="text-sm mt-4 opacity-90">
-              Special price saves you $11,503 off the full program
+              Only 13 spots left at $497 (returns to $997 after)
             </p>
           </div>
         </div>
@@ -736,13 +741,6 @@ export default function OptimizedHome() {
       {/* Final CTA Section */}
       <section className="py-20 px-4 bg-gradient-to-br from-gray-900 to-black text-white text-center">
         <div className="max-w-3xl mx-auto">
-          {/* Urgency */}
-          <div className="bg-red-600 text-white rounded-lg p-3 mb-8 animate-pulse">
-            <p className="text-lg font-bold">
-              ⚠️ WARNING: This $497 Price Expires When Timer Hits Zero
-            </p>
-          </div>
-
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             One Video. 20 Minutes. Everything You Need.
           </h2>
@@ -752,18 +750,18 @@ export default function OptimizedHome() {
           
           <div className="bg-white/10 backdrop-blur rounded-xl p-8 mb-8">
             <p className="text-lg text-gray-300 line-through mb-2">
-              Regular Price: $12,000
+              Regular Price: $997
             </p>
             <p className="text-5xl font-bold text-yellow-400 mb-4">
               Today Only: $497
             </p>
             <p className="text-2xl text-green-400 font-bold mb-6">
-              You Save $11,503 (96% OFF)
+              You Save $500 (50% OFF)
             </p>
             
             <Button 
               onClick={() => {
-                const element = document.querySelector('#apply-section');
+                const element = document.querySelector('#apply-form');
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
               size="lg"
@@ -800,7 +798,7 @@ export default function OptimizedHome() {
         <div className="fixed bottom-0 left-0 right-0 bg-black text-white p-4 z-40 lg:hidden shadow-2xl">
           <Button 
             onClick={() => {
-              const element = document.querySelector('#apply-section');
+              const element = document.querySelector('#apply-form');
               element?.scrollIntoView({ behavior: 'smooth' });
             }}
             className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 font-bold"
@@ -822,7 +820,7 @@ export default function OptimizedHome() {
             <Link href="/disclaimer" className="hover:text-white">Earnings Disclaimer</Link>
             <Link href="/contact" className="hover:text-white">Contact</Link>
           </div>
-          <p>© 2025 APEX Operations LLC. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} APEX Operations LLC. All rights reserved.</p>
           <p className="mt-2 text-xs">
             Earnings Disclaimer: Results are not typical and depend on effort and market conditions. 
             No guarantee of income. Your results may vary.
