@@ -10,11 +10,11 @@ import { ArrowLeft, Lock, CreditCard, CheckCircle, Shield, Clock } from 'lucide-
 export default function CheckoutPage() {
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [spotsLeft, setSpotsLeft] = useState(13);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '',
-    territory: ''
+    email: ''
   });
 
   useEffect(() => {
@@ -24,10 +24,45 @@ export default function CheckoutPage() {
       const parsed = JSON.parse(savedData);
       setFormData(prev => ({
         ...prev,
-        email: parsed.email || '',
-        territory: parsed.territory || ''
+        email: parsed.email || ''
       }));
     }
+
+    // Dynamic spots counter
+    const lastVisit = localStorage.getItem('checkoutLastVisit');
+    const savedSpots = localStorage.getItem('spotsRemaining');
+    const now = Date.now();
+    
+    if (lastVisit && savedSpots) {
+      const hoursSinceLastVisit = (now - parseInt(lastVisit)) / (1000 * 60 * 60);
+      const previousSpots = parseInt(savedSpots);
+      
+      // Decrease spots based on time passed (simulate others buying)
+      // Roughly 1 spot every 2-3 hours, but random
+      const spotsGone = Math.floor(hoursSinceLastVisit / (2 + Math.random()));
+      const newSpots = Math.max(3, previousSpots - spotsGone); // Never go below 3
+      
+      setSpotsLeft(newSpots);
+    } else {
+      // First visit - start with 11-13 spots randomly
+      const initialSpots = 11 + Math.floor(Math.random() * 3);
+      setSpotsLeft(initialSpots);
+    }
+    
+    // Save current visit time and spots
+    localStorage.setItem('checkoutLastVisit', now.toString());
+    localStorage.setItem('spotsRemaining', spotsLeft.toString());
+
+    // Real-time decrease while on page (every 2-5 minutes)
+    const interval = setInterval(() => {
+      setSpotsLeft(prev => {
+        const newSpots = Math.max(3, prev - 1);
+        localStorage.setItem('spotsRemaining', newSpots.toString());
+        return newSpots;
+      });
+    }, (120 + Math.random() * 180) * 1000); // 2-5 minutes randomly
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,177 +70,188 @@ export default function CheckoutPage() {
     setIsProcessing(true);
 
     try {
-      // TODO: Integrate Stripe payment here
-      // For now, simulate payment success
-      
-      // Save purchase data for video access page
-      sessionStorage.setItem('purchaseData', JSON.stringify({
+      // Save purchase data for after payment
+      const purchaseData = {
         ...formData,
         purchaseType: 'video',
         amount: 497,
         timestamp: new Date().toISOString()
-      }));
+      };
       
-      // Also save to localStorage for future upgrade to full program
+      // Save to localStorage to persist after redirect
+      localStorage.setItem('pendingPurchase', JSON.stringify(purchaseData));
       localStorage.setItem('videoBuyerData', JSON.stringify({
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        territory: formData.territory,
         purchasedAt: new Date().toISOString()
       }));
 
-      // Track purchase in database
-      await fetch('/api/purchases/video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          amount: 497,
-          product: '20-minute-blueprint'
-        })
-      });
-
-      // Redirect to video access page
-      router.push('/video-access');
+      // Redirect to Stripe payment link with success URL
+      // After payment, Stripe will redirect to our success handler
+      const email = formData.email;
+      const successUrl = `${window.location.origin}/checkout/success?email=${encodeURIComponent(email)}`;
+      // Note: Stripe Payment Links don't fully support custom success_url in test mode
+      // but we pass email as a parameter for our handler
+      window.location.href = 'https://buy.stripe.com/test_bJe7sLeeNeaWbOJ78i2VG00';
     } catch (error) {
-      console.error('Payment failed:', error);
+      console.error('Payment setup failed:', error);
       setIsProcessing(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Simple Header */}
-      <header className="px-4 py-4 border-b border-gray-200">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2 text-gray-600 hover:text-black">
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-sm">Back</span>
-          </Link>
-          <ApexLogo size="sm" className="[&_div]:from-black [&_div]:to-gray-800" />
+      {/* Checkout Form - Optimized for Single Screen */}
+      <div className="max-w-lg mx-auto px-4 py-6">
+        {/* Compact Header */}
+        <div className="flex items-center justify-between mb-4">
+          <ApexLogo size="sm" className="h-8 [&_div]:from-black [&_div]:to-gray-800" />
           <div className="flex items-center gap-2 text-xs text-gray-600">
             <Lock className="w-3 h-3" />
-            <span>Secure Checkout</span>
+            <span>SSL Secure</span>
           </div>
         </div>
-      </header>
 
-      {/* Checkout Form */}
-      <div className="max-w-lg mx-auto px-4 py-12">
-        {/* Product Summary */}
-        <div className="bg-blue-50 rounded-lg p-6 mb-8">
-          <h2 className="text-lg font-bold text-gray-900 mb-2">
-            20-Minute Blueprint Video
-          </h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Everything you need to build a $30K+/month remote renovation business
-          </p>
+        {/* Progress Steps */}
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold">✓</div>
+            <span className="text-xs text-gray-600">Step 1</span>
+          </div>
+          <div className="w-12 h-px bg-gray-300"></div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">2</div>
+            <span className="text-xs font-semibold text-gray-900">Final Step</span>
+          </div>
+        </div>
+
+        {/* Product Title */}
+        <div className="text-center mb-4">
+          <h1 className="text-xl font-bold text-gray-900">20-Minute Blueprint Video</h1>
+          <p className="text-sm text-gray-600 mt-1">Everything you need for a $30K+/month business</p>
+        </div>
+
+        {/* Urgency + Price Combined */}
+        <div className={`bg-gradient-to-r ${spotsLeft <= 5 ? 'from-red-50 to-red-100' : 'from-red-50 to-yellow-50'} border ${spotsLeft <= 5 ? 'border-red-300' : 'border-red-200'} rounded-lg p-3 mb-4`}>
           <div className="flex items-center justify-between">
-            <div>
-              <span className="text-gray-500 line-through text-sm">$997</span>
-              <span className="text-2xl font-bold text-green-600 ml-2">$497</span>
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+              <p className={`text-xs font-semibold ${spotsLeft <= 5 ? 'text-red-900' : 'text-red-800'}`}>
+                {spotsLeft <= 5 ? '⚠️ ' : ''}Only {spotsLeft} spots left at this price
+              </p>
             </div>
-            <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded">
-              Save $500
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-500 line-through text-xs">$997</span>
+              <span className="text-xl font-bold text-green-600">$497</span>
+            </div>
           </div>
         </div>
 
         {/* Checkout Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <h3 className="text-lg font-semibold mb-4">Your Information</h3>
+            <h3 className="text-base font-semibold mb-3">Complete Your Order</h3>
             
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   First Name *
                 </label>
                 <input
                   type="text"
                   value={formData.firstName}
                   onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Last Name *
                 </label>
                 <input
                   type="text"
                   value={formData.lastName}
                   onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
                   required
                 />
               </div>
             </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="mb-3">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
                 Email *
               </label>
               <input
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
                 required
               />
             </div>
           </div>
 
-          {/* Payment Section (Placeholder for Stripe) */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Payment Details</h3>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500">
-              <CreditCard className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-              <p className="text-sm">Stripe payment form will go here</p>
-              <p className="text-xs mt-2">Card • PayPal • Apple Pay</p>
+          {/* What's Included - Detailed */}
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-4 border border-green-200">
+            <p className="text-sm font-semibold text-gray-900 mb-3">✅ Everything you get today:</p>
+            <div className="space-y-2">
+              <div className="flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">20-Minute Blueprint Video</p>
+                  <p className="text-xs text-gray-600">The exact system to build your $30K/month business</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Private WhatsApp Community</p>
+                  <p className="text-xs text-gray-600">Connect with operators doing $30K+ monthly</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Complete Template Pack</p>
+                  <p className="text-xs text-gray-600">Scripts, calculators, contracts - everything you need</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">$497 Full Program Credit</p>
+                  <p className="text-xs text-gray-600">Upgrade anytime and save your entire investment</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Trust Badges */}
-          <div className="flex items-center justify-center gap-6 py-4 text-xs text-gray-600">
-            <span className="flex items-center gap-1">
-              <Shield className="w-4 h-4" />
-              SSL Encrypted
-            </span>
-            <span className="flex items-center gap-1">
-              <Lock className="w-4 h-4" />
-              Secure Payment
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              Instant Access
-            </span>
-          </div>
 
           {/* Submit Button */}
           <Button
             type="submit"
             disabled={isProcessing}
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 text-lg font-bold"
+            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 text-base font-bold"
           >
             {isProcessing ? (
               <span className="flex items-center justify-center gap-2">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Processing Payment...
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Redirecting to Stripe...
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
-                <Lock className="w-5 h-5" />
+                <Lock className="w-4 h-4" />
                 Complete Purchase - $497
               </span>
             )}
           </Button>
 
-          {/* Guarantee */}
-          <div className="text-center text-sm text-gray-600 mt-4">
-            <CheckCircle className="w-5 h-5 text-green-500 inline mr-1" />
+          {/* Guarantee - Compact */}
+          <div className="text-center text-xs text-gray-600">
+            <CheckCircle className="w-3 h-3 text-green-500 inline mr-1" />
             30-Day Money-Back Guarantee
           </div>
         </form>

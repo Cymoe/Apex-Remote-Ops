@@ -1,17 +1,30 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { ApexLogo } from '@/components/apex-logo';
+import { CheckCircle } from 'lucide-react';
 
 export default function SignInPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+  
+  useEffect(() => {
+    // Check for success messages in URL params
+    const success = searchParams.get('success');
+    const email = searchParams.get('email');
+    
+    if (success === 'video_purchased') {
+      setSuccessMessage('Purchase successful! Sign in to access your Blueprint.');
+    }
+  }, [searchParams]);
 
   const handleGoogleSignIn = async () => {
     setError(null);
@@ -52,6 +65,16 @@ export default function SignInPage() {
             </div>
           </div>
 
+          {/* Success Message */}
+          {successMessage && (
+            <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+              <div className="flex items-center justify-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-400" />
+                <p className="text-green-400 text-sm">{successMessage}</p>
+              </div>
+            </div>
+          )}
+          
           {/* Error Message */}
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">

@@ -24,8 +24,11 @@ import {
   Rocket,
   DollarSign,
   Monitor,
-  Settings
+  Settings,
+  Lock
 } from 'lucide-react';
+import { getUserAccess, getAccessibleCourses } from '@/lib/user-access';
+import { redirect } from 'next/navigation';
 
 interface Course {
   id: string;
@@ -215,11 +218,19 @@ function CourseCard({ course, isComingSoon = false }: { course: any; isComingSoo
 }
 
 export default async function CoursesPage() {
-  const courses = await getCourses();
-  
   // Get user data for personalization
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  
+  // Check user access level
+  const userAccess = await getUserAccess(user?.email || null);
+  
+  // If video buyer, redirect to their blueprint course
+  if (userAccess.purchaseType === 'video_only') {
+    redirect('/courses/blueprint-video');
+  }
+  
+  const courses = await getCourses();
   
   // Calculate overall stats dynamically
   const completedCourses = courses.filter(c => c.progressPercentage === 100).length;

@@ -1,37 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { MapPin, CheckCircle, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { trackEmailCapture, trackTerritoryCheck, trackCTAClick, trackFormInteraction } from '@/lib/analytics/tracker';
-
-const availableTerritories = [
-  'Houston, TX',
-  'Austin, TX', 
-  'Atlanta, GA',
-  'Nashville, TN',
-  'Tampa, FL',
-  'Charlotte, NC',
-  'San Antonio, TX',
-  'Orlando, FL',
-  'Raleigh, NC',
-  'Jacksonville, FL'
-];
-
-const takenTerritories = [
-  'Phoenix, AZ',
-  'Dallas, TX',
-  'Miami, FL',
-  'Denver, CO',
-  'Las Vegas, NV',
-  'Chicago, IL',
-  'San Diego, CA'
-];
+import { trackEmailCapture, trackCTAClick, trackFormInteraction } from '@/lib/analytics/tracker';
 
 export function TwoStepApply() {
   const router = useRouter();
-  const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -76,28 +51,16 @@ export function TwoStepApply() {
       // Continue anyway - don't block the user
     }
     
-    // Short delay for UX then go to step 2
+    // Short delay for UX then redirect to checkout
     setTimeout(() => {
-      setIsProcessing(false);
-      setStep(2);
-    }, 1000);
+      router.push('/checkout');
+    }, 500);
   };
 
-  const handleFullApplication = () => {
-    // Track conversion
-    trackCTAClick('complete-application', 'two-step-form-step-2');
-    
-    // For $497 video purchase, go to simple checkout
-    // Email already saved in step 1
-    
-    // Redirect to simple checkout for video purchase
-    router.push('/checkout');
-  };
 
   return (
     <div className="bg-white rounded-xl shadow-xl border-2 border-blue-500 p-4 sm:p-6 md:p-8">
-      {step === 1 ? (
-        <form onSubmit={handleStep1Submit} className="space-y-4 md:space-y-6">
+      <form onSubmit={handleStep1Submit} className="space-y-4 md:space-y-6">
           <div className="text-center mb-4 md:mb-6">
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
               Get Your 20-Minute Blueprint
@@ -108,17 +71,6 @@ export function TwoStepApply() {
             <p className="text-lg font-bold text-green-600 mt-2">
               Only $497 Today (Save $500)
             </p>
-          </div>
-
-          {/* Progress indicator */}
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
-              1
-            </div>
-            <div className="w-20 h-1 bg-gray-300" />
-            <div className="w-8 h-8 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center font-bold">
-              2
-            </div>
           </div>
 
           <div>
@@ -148,7 +100,7 @@ export function TwoStepApply() {
             {isProcessing ? (
               <span className="flex items-center justify-center gap-2">
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Processing...
+                Securing Your Spot...
               </span>
             ) : (
               'Get Instant Access →'
@@ -159,62 +111,6 @@ export function TwoStepApply() {
             🔒 Secure checkout • 30-day guarantee • Instant access
           </p>
         </form>
-      ) : (
-        <div className="space-y-4 md:space-y-6 animate-fadeIn">
-          <div className="text-center">
-            <CheckCircle className="w-12 sm:w-16 h-12 sm:h-16 text-green-500 mx-auto mb-3 md:mb-4" />
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-              Perfect! Your Special Price is Active!
-            </h3>
-            <p className="text-sm sm:text-base text-gray-600">
-              Complete your purchase to get instant access
-            </p>
-            <p className="text-xs text-red-600 mt-2">
-              ⚠️ Price held for 20 minutes only
-            </p>
-          </div>
-
-          {/* Progress indicator */}
-          <div className="flex items-center justify-center gap-2">
-            <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center">
-              <CheckCircle className="w-5 h-5" />
-            </div>
-            <div className="w-20 h-1 bg-green-500" />
-            <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold animate-pulse">
-              2
-            </div>
-          </div>
-
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <h4 className="font-semibold text-gray-900 mb-2">What You're Getting:</h4>
-            <ul className="space-y-1 text-sm text-gray-700">
-              <li>✅ The Complete 20-Minute Blueprint Video</li>
-              <li>✅ WhatsApp Group Access (AI & Systems)</li>
-              <li>✅ Crew Hiring Scripts & Templates</li>
-              <li>✅ Pricing Calculator & Profit Formula</li>
-              <li>✅ 30-Day Money-Back Guarantee</li>
-            </ul>
-            <div className="mt-3 pt-3 border-t border-green-200">
-              <p className="text-center">
-                <span className="text-gray-500 line-through">Regular: $997</span>
-                <span className="text-green-700 font-bold text-lg ml-2">Today: $497</span>
-              </p>
-            </div>
-          </div>
-
-          <Button
-            onClick={handleFullApplication}
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-3 md:py-4 text-sm sm:text-base md:text-lg font-semibold rounded-lg"
-          >
-            <span className="block sm:hidden">Get Access for $497 →</span>
-            <span className="hidden sm:block">Get Instant Access for $497 →</span>
-          </Button>
-
-          <p className="text-xs text-gray-500 text-center">
-            🔒 Secure Payment • SSL Encrypted • 30-Day Guarantee
-          </p>
-        </div>
-      )}
     </div>
   );
 }

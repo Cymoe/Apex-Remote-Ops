@@ -105,18 +105,13 @@ export async function sendVideoWelcomeEmail(data: VideoEmailData) {
 }
 
 // Send purchase confirmation with video access
-export async function sendVideoPurchaseEmail(data: VideoEmailData) {
-  const { email, firstName, videoUrl, whatsappLink } = data;
-  
-  const videoLink = videoUrl || 'https://www.loom.com/share/c954a298a53c45dfb558460b77a79552';
-  const whatsapp = whatsappLink || process.env.NEXT_PUBLIC_WHATSAPP_GROUP_LINK || '#';
-  
+export async function sendWelcomeEmailToVideoBuyer(email: string) {
   try {
     const result = await resend.emails.send({
       from: FROM_EMAIL,
       to: email,
       replyTo: SUPPORT_EMAIL,
-      subject: '🎉 Welcome! Here\'s Your $497 Blueprint + WhatsApp Access',
+      subject: '🎉 Welcome! Sign in to access your Blueprint',
       html: `
         <!DOCTYPE html>
         <html>
@@ -128,7 +123,81 @@ export async function sendVideoPurchaseEmail(data: VideoEmailData) {
           <div style="background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             
             <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 20px;">
-              Welcome ${firstName ? firstName + '!' : 'to APEX!'} Your Blueprint is Ready 🚀
+              Welcome to APEX! Your Blueprint is Ready 🚀
+            </h1>
+            
+            <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
+              Thank you for your purchase! We've created your account and your 20-Minute Blueprint is ready to watch.
+            </p>
+            
+            <div style="background: #f0fdf4; border: 2px solid #22c55e; padding: 20px; margin: 25px 0; border-radius: 8px;">
+              <h2 style="color: #15803d; font-size: 18px; margin: 0 0 15px 0;">
+                📹 Access Your Blueprint
+              </h2>
+              <p style="margin: 0 0 15px 0; color: #166534;">
+                Sign in with your Google account to access:
+              </p>
+              <ul style="margin: 10px 0; padding-left: 20px; color: #166534;">
+                <li>Your 20-minute blueprint video</li>
+                <li>Downloadable resources and templates</li>
+                <li>WhatsApp community access</li>
+                <li>Special upgrade opportunities</li>
+              </ul>
+              <div style="text-align: center;">
+                <a href="https://remoteops.ai/auth/sign-in" style="display: inline-block; background: #22c55e; color: white; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-weight: bold;">
+                  Sign In to Get Started →
+                </a>
+              </div>
+            </div>
+            
+            <p style="font-size: 14px; color: #777; margin-top: 30px;">
+              Simply click the button above and sign in with Google. Your purchase has been linked to this email address.
+            </p>
+            
+            <p style="font-size: 14px; color: #777; margin-top: 20px;">
+              Let's build something amazing,<br>
+              <strong>Myles Webb</strong><br>
+              Founder, APEX Remote Operations
+            </p>
+            
+            <p style="font-size: 12px; color: #999; margin-top: 30px; text-align: center;">
+              Need help? Reply to this email or reach out to ${SUPPORT_EMAIL}
+            </p>
+          </div>
+        </body>
+        </html>
+      `
+    });
+    
+    return { success: true, id: result.data?.id };
+  } catch (error) {
+    console.error('Failed to send welcome email to video buyer:', error);
+    return { success: false, error };
+  }
+}
+
+export async function sendVideoPurchaseEmail(email: string) {
+  const videoUrl = 'https://remoteops.ai/dashboard';
+  const whatsapp = process.env.NEXT_PUBLIC_WHATSAPP_GROUP_LINK || '#';
+  
+  try {
+    const result = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: email,
+      replyTo: SUPPORT_EMAIL,
+      subject: '🎉 Welcome back! Your Blueprint is ready',
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            
+            <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 20px;">
+              Your Blueprint Purchase is Complete! 🚀
             </h1>
             
             <p style="font-size: 16px; color: #555; margin-bottom: 20px;">

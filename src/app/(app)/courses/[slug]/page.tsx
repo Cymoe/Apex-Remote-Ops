@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -22,6 +22,7 @@ import { CourseHeader } from '@/components/course/course-header';
 import { EmptyModuleSection } from '@/components/course/empty-module-section';
 import { EnhancedSidebar } from '@/components/course/enhanced-sidebar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { canAccessCourse } from '@/lib/user-access';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -99,6 +100,23 @@ async function getCourseWithModules(slug: string) {
 export default async function CourseDetailPage({ params, searchParams }: CourseDetailPageProps) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
+  
+  // Check user authentication first
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  // Check if user can access this course
+  const hasAccess = await canAccessCourse(user?.email || null, resolvedParams.slug);
+  
+  if (!hasAccess) {
+    // If video buyer trying to access non-blueprint course, redirect to upgrade
+    if (user?.email) {
+      redirect('/upgrade');
+    } else {
+      redirect('/auth/sign-in');
+    }
+  }
+  
   const courseData = await getCourseWithModules(resolvedParams.slug);
   
   if (!courseData) {
