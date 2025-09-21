@@ -3,8 +3,8 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Use onboarding@resend.dev for testing if domain not verified
-// Change to 'Myles from APEX <myles@remoteops.ai>' once domain is verified in Resend
-const FROM_EMAIL = 'Myles from APEX <onboarding@resend.dev>';
+// Change to 'Myles from Remote Ops <myles@remoteops.ai>' once domain is verified in Resend
+const FROM_EMAIL = 'Myles from Remote Ops <onboarding@resend.dev>';
 const SUPPORT_EMAIL = 'support@remoteops.ai';
 
 interface VideoEmailData {
@@ -85,7 +85,7 @@ export async function sendVideoWelcomeEmail(data: VideoEmailData) {
             <p style="font-size: 14px; color: #777; margin-top: 20px;">
               Ready when you are,<br>
               <strong>Myles Webb</strong><br>
-              Founder, APEX Remote Operations
+              Founder, Remote Ops
             </p>
             
             <p style="font-size: 12px; color: #999; margin-top: 30px; text-align: center;">
@@ -108,6 +108,11 @@ export async function sendVideoWelcomeEmail(data: VideoEmailData) {
 
 // Send purchase confirmation with video access
 export async function sendWelcomeEmailToVideoBuyer(email: string) {
+  console.log('sendWelcomeEmailToVideoBuyer called with:', email);
+  console.log('FROM_EMAIL:', FROM_EMAIL);
+  console.log('Resend API key exists:', !!process.env.RESEND_API_KEY);
+  console.log('Resend API key:', process.env.RESEND_API_KEY?.substring(0, 15) + '...');
+  
   try {
     const result = await resend.emails.send({
       from: FROM_EMAIL,
@@ -125,7 +130,7 @@ export async function sendWelcomeEmailToVideoBuyer(email: string) {
           <div style="background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             
             <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 20px;">
-              Welcome to APEX! Your Blueprint is Ready 🚀
+              Welcome to Remote Ops! Your Blueprint is Ready 🚀
             </h1>
             
             <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
@@ -159,7 +164,7 @@ export async function sendWelcomeEmailToVideoBuyer(email: string) {
             <p style="font-size: 14px; color: #777; margin-top: 20px;">
               Let's build something amazing,<br>
               <strong>Myles Webb</strong><br>
-              Founder, APEX Remote Operations
+              Founder, Remote Ops
             </p>
             
             <p style="font-size: 12px; color: #999; margin-top: 30px; text-align: center;">
@@ -171,10 +176,12 @@ export async function sendWelcomeEmailToVideoBuyer(email: string) {
       `
     });
     
+    console.log('Email sent successfully:', result.data);
     return { success: true, id: result.data?.id };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to send welcome email to video buyer:', error);
-    return { success: false, error };
+    console.error('Error details:', error?.message || error);
+    return { success: false, error: error?.message || String(error) };
   }
 }
 
@@ -257,7 +264,7 @@ export async function sendVideoPurchaseEmail(email: string) {
             <p style="font-size: 14px; color: #777; margin-top: 20px;">
               Let's build something amazing,<br>
               <strong>Myles Webb</strong><br>
-              Founder, APEX Remote Operations
+              Founder, Remote Ops
             </p>
             
             <p style="font-size: 12px; color: #999; margin-top: 30px; text-align: center;">
