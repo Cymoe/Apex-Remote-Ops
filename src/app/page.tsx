@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ApexLogo } from '@/components/apex-logo';
 import { CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -77,21 +76,6 @@ export default function OptimizedHome() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
-      {/* Header - Mobile Optimized */}
-      <header className="px-4 py-2 border-b border-gray-200 bg-white sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <ApexLogo size="sm" className="md:hidden [&_div]:from-black [&_div]:to-gray-800" />
-          <ApexLogo size="md" className="hidden md:block [&_div]:from-black [&_div]:to-gray-800" />
-            <Link 
-              href="/auth/sign-in" 
-            className="text-xs md:text-sm font-medium text-gray-600 hover:text-black transition-colors"
-            >
-            Login
-            </Link>
-        </div>
-      </header>
-
-
       {/* Hero Section - Mobile Optimized */}
       <section className="py-8 md:py-12 px-4">
         <div className="max-w-6xl mx-auto">
