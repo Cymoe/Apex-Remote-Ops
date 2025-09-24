@@ -62,10 +62,10 @@ export async function POST(request: NextRequest) {
         const { beehiiv } = await import('@/lib/beehiiv/client');
         const beehiivResult = await beehiiv.addSubscriber({
           email,
+          tags: ['lead'], // Add lead tag
           utm_source: source || 'website',
           utm_medium: 'lead_capture',
           utm_campaign: 'blueprint_video',
-          tags: ['lead'],
           custom_fields: [
             { name: 'first_name', value: metadata?.firstName || '' },
             { name: 'source', value: source || '' }
@@ -113,10 +113,10 @@ export async function POST(request: NextRequest) {
       const { beehiiv } = await import('@/lib/beehiiv/client');
       const beehiivResult = await beehiiv.addSubscriber({
         email,
+        tags: ['lead'], // Add lead tag
         utm_source: source || 'website',
         utm_medium: 'lead_capture',
         utm_campaign: 'blueprint_video',
-        tags: ['lead'], // Add tag during creation
         custom_fields: [
           { name: 'first_name', value: metadata?.firstName || '' },
           { name: 'source', value: source || '' }

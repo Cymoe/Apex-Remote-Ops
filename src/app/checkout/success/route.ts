@@ -191,14 +191,21 @@ export async function GET(request: NextRequest) {
       console.error('Error recording purchase:', purchaseError);
     }
     
-    // Tag in Beehiiv as customer
-    console.log('Tagging subscriber in Beehiiv as customer...');
+    // Add to Beehiiv with customer tags
+    console.log('Adding/updating subscriber in Beehiiv with tags...');
     try {
       const { beehiiv } = await import('@/lib/beehiiv/client');
-      const tagResult = await beehiiv.tagSubscriber(email, ['customer', 'blueprint-buyer']);
-      console.log('Beehiiv tag result:', tagResult);
+      const beehiivResult = await beehiiv.addSubscriber({
+        email,
+        tags: ['customer', 'blueprint-buyer'], // Add tags for customers
+        utm_source: 'website',
+        utm_medium: 'checkout',
+        utm_campaign: 'blueprint_purchase',
+        custom_fields: []
+      });
+      console.log('Beehiiv result:', beehiivResult);
     } catch (beehiivError) {
-      console.error('Failed to tag in Beehiiv:', beehiivError);
+      console.error('Failed to update in Beehiiv:', beehiivError);
       // Don't fail the purchase if Beehiiv fails
     }
     

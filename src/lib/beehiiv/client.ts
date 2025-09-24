@@ -12,10 +12,6 @@ interface BeehiivSubscriber {
   custom_fields?: Array<{ name: string; value: string }>;
 }
 
-interface BeehiivTag {
-  email: string;
-  tags: string[];
-}
 
 export class BeehiivClient {
   private apiKey: string;
@@ -40,6 +36,7 @@ export class BeehiivClient {
     try {
       const { tags, ...subscriberData } = data;
       
+      // First, create/update the subscriber
       const response = await fetch(
         `${this.baseUrl}/publications/${this.publicationId}/subscriptions`,
         {
@@ -52,7 +49,6 @@ export class BeehiivClient {
             ...subscriberData,
             reactivate_existing: true, // Reactivate if they unsubscribed
             send_welcome_email: false, // We handle welcome emails ourselves
-            // Note: Tags might need to be applied separately after creation
           }),
         }
       );
@@ -66,13 +62,29 @@ export class BeehiivClient {
       const result = await response.json();
       console.log('Added to Beehiiv:', result);
       
-      // If tags were provided, apply them after a small delay to ensure subscriber is indexed
-      if (tags && tags.length > 0 && result.data?.email) {
-        console.log('Applying tags to new subscriber:', tags);
-        // Small delay to ensure Beehiiv has indexed the new subscriber
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const tagResult = await this.tagSubscriber(result.data.email, tags);
-        console.log('Tag result:', tagResult);
+      // If tags were provided and we have a subscriber ID, add tags
+      if (tags && tags.length > 0 && result.data?.id) {
+        console.log('Adding tags to subscriber:', tags);
+        const tagsResponse = await fetch(
+          `${this.baseUrl}/publications/${this.publicationId}/subscriptions/${result.data.id}/tags`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${this.apiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              tags: tags,
+            }),
+          }
+        );
+        
+        if (tagsResponse.ok) {
+          const tagsResult = await tagsResponse.json();
+          console.log('Tags applied successfully:', tagsResult.data?.tags);
+        } else {
+          console.error('Failed to apply tags:', await tagsResponse.text());
+        }
       }
       
       return { success: true, id: result.data?.id };
@@ -139,6 +151,9 @@ export class BeehiivClient {
         console.error('Beehiiv tag error:', error);
         return { success: false, error };
       }
+      
+      const updateResult = await updateResponse.json();
+      console.log('Tag update result:', updateResult);
 
       console.log(`Tagged ${email} with:`, tags);
       return { success: true };
