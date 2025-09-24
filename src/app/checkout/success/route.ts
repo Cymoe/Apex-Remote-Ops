@@ -197,7 +197,7 @@ export async function GET(request: NextRequest) {
       const { beehiiv } = await import('@/lib/beehiiv/client');
       const beehiivResult = await beehiiv.addSubscriber({
         email,
-        tags: ['customer', 'blueprint-buyer'], // Add tags for customers
+        tags: ['customer', 'blueprint-buyer'], // Add customer and blueprint-buyer tags
         utm_source: 'website',
         utm_medium: 'checkout',
         utm_campaign: 'blueprint_purchase',
