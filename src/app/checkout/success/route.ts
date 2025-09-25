@@ -191,7 +191,18 @@ export async function GET(request: NextRequest) {
       console.error('Error recording purchase:', purchaseError);
     }
     
-    // Add to Beehiiv with customer tags
+    // Update customer status in Loops
+    console.log('Marking as customer in Loops...');
+    try {
+      const { loops } = await import('@/lib/loops/client');
+      const loopsResult = await loops.markAsCustomer(email, 'blueprint');
+      console.log('Loops result:', loopsResult);
+    } catch (loopsError) {
+      console.error('Failed to update in Loops:', loopsError);
+      // Don't fail the purchase if Loops fails
+    }
+    
+    // Also update in Beehiiv for now (can remove later)
     console.log('Adding/updating subscriber in Beehiiv with tags...');
     try {
       const { beehiiv } = await import('@/lib/beehiiv/client');

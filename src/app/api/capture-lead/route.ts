@@ -56,9 +56,14 @@ export async function POST(request: NextRequest) {
         console.error('Error updating lead:', updateError);
       }
       
-      // Add to Beehiiv even if existing lead (they might not be in Beehiiv yet)
-      console.log('Adding existing lead to Beehiiv...');
+      // Add to Loops (updating existing contact if already exists)
+      console.log('Adding existing lead to Loops...');
       try {
+        const { loops } = await import('@/lib/loops/client');
+        const loopsResult = await loops.startLeadNurture(email, metadata?.firstName);
+        console.log('Loops result for existing lead:', loopsResult);
+        
+        // Also add to Beehiiv for now (can remove later)
         const { beehiiv } = await import('@/lib/beehiiv/client');
         const beehiivResult = await beehiiv.addSubscriber({
           email,
@@ -72,8 +77,8 @@ export async function POST(request: NextRequest) {
           ]
         });
         console.log('Beehiiv result for existing lead:', beehiivResult);
-      } catch (beehiivError) {
-        console.error('Failed to add to Beehiiv:', beehiivError);
+      } catch (error) {
+        console.error('Failed to add to email services:', error);
       }
 
       return NextResponse.json({
@@ -107,9 +112,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Add to Beehiiv for nurture sequences
-    console.log('Adding lead to Beehiiv for nurture sequences...');
+    // Add to Loops for nurture sequences
+    console.log('Adding lead to Loops for nurture sequences...');
     try {
+      const { loops } = await import('@/lib/loops/client');
+      const loopsResult = await loops.startLeadNurture(email, metadata?.firstName);
+      console.log('Loops result (nurture sequence started):', loopsResult);
+      
+      // Also add to Beehiiv for now (can remove later)
       const { beehiiv } = await import('@/lib/beehiiv/client');
       const beehiivResult = await beehiiv.addSubscriber({
         email,
@@ -123,9 +133,9 @@ export async function POST(request: NextRequest) {
         ]
       });
       console.log('Beehiiv result (with lead tag):', beehiivResult);
-    } catch (beehiivError) {
-      console.error('Failed to add to Beehiiv:', beehiivError);
-      // Don't fail the request if Beehiiv fails
+    } catch (error) {
+      console.error('Failed to add to email services:', error);
+      // Don't fail the request if email services fail
     }
 
     return NextResponse.json({
